@@ -63,7 +63,13 @@ export class CompletionScene extends Scene {
     this.chest.y = this.sub.y + 110;
     this.container.addChild(this.chest, this.sub);
 
-    await wait(400);
+    // Run the cutscene AFTER enter() returns so it plays in view rather
+    // than behind the scene-transition fade.
+    this.runSequence().catch(console.error);
+  }
+
+  async runSequence() {
+    await wait(700); // let the fade lift
     if (this.perfect) await this.perfectSequence();
     else await this.imperfectSequence();
   }

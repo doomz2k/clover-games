@@ -54,9 +54,11 @@ export class IntroScene extends Scene {
     tween(this.rack, { y: H - 480 }, 1200, { ease: Ease.outCubic, delay: 600 });
     this.container.addChild(this.rack, this.sub);
 
-    await wait(750);
-    say(`Hello! I'm ${level.creature} at ${level.name}. Can you help me collect my pearls?`);
-    this.creature.jump();
+    // greet once the fade has lifted and the creature has swum in
+    wait(1000).then(() => {
+      say(`Hello! I'm ${level.creature} at ${level.name}. Can you help me collect my pearls?`);
+      this.creature.jump();
+    });
 
     this.goBtn = makeButton('Dive in!', { width: 330, height: 96, fontSize: 40 });
     this.goBtn.x = W / 2;

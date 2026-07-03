@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Garden Maths</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #2e5d2a;
+    touch-action: none;
+    -webkit-user-select: none; user-select: none;
+  }
+  #game-canvas-holder { position: fixed; inset: 0; }
+  canvas { display: block; }
+
+  #hub-btn {
+    position: fixed; top: 14px; left: 14px; z-index: 20;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 18px; color: #2e3d1a;
+    background: #ffd75e;
+    border: 3px solid #b8860b;
+    border-radius: 14px;
+    padding: 8px 16px;
+    text-decoration: none;
+    box-shadow: 0 4px 0 #b8860b;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  #hub-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b8860b; }
+
+  #loading {
+    position: fixed; inset: 0; z-index: 50;
+    background: linear-gradient(180deg, #ffd9e8 0%, #a8d8f0 45%, #4a7c3f 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 28px;
+    font-family: 'Fredoka One', sans-serif;
+    transition: opacity 0.5s;
+  }
+  #loading.done { opacity: 0; pointer-events: none; }
+  #loading h1 {
+    color: #2e5d2a; font-size: clamp(28px, 6vw, 52px);
+    text-shadow: 0 2px 0 rgba(255,255,255,0.6);
+    letter-spacing: 2px;
+  }
+  #load-flower { font-size: 56px; animation: grow 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+  @keyframes grow { 0%,100% { transform: scale(1) rotate(-3deg); } 50% { transform: scale(1.12) rotate(3deg); } }
+  #load-track {
+    width: min(60vw, 420px); height: 26px;
+    background: #3a5c33;
+    border: 3px solid #2e4d28;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  #load-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #7ac74f, #ffd75e);
+    border-radius: 10px;
+    transition: width 0.15s;
+  }
+  #load-msg { color: #2e4d28; font-size: 16px; }
+</style>
+</head>
+<body>
+  <div id="game-canvas-holder"></div>
+  <a id="hub-btn" href="../index.html" title="Back to the hub">&#8962; Hub</a>
+
+  <div id="loading">
+    <div id="load-flower">&#127803;</div>
+    <h1>GARDEN MATHS</h1>
+    <div id="load-track"><div id="load-bar"></div></div>
+    <div id="load-msg">Watering the seedlings&hellip;</div>
+  </div>
+
+  <!-- PixiJS v8 from CDN, with a vendored copy as offline fallback -->
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"
+          onerror="var s=document.createElement('script');s.src='../vendor/pixi.min.js';document.head.appendChild(s);"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

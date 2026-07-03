@@ -59,11 +59,11 @@
   /* ---- game shelf ---- */
   main {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 380px));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 355px));
     gap: clamp(20px, 3.5vw, 40px);
     justify-content: center;
     width: 100%;
-    max-width: 900px;
+    max-width: 1260px;
   }
   .game-card {
     display: block;
@@ -111,6 +111,15 @@
     animation: rise 5s linear infinite;
   }
   @keyframes rise { to { transform: translateY(-240px); opacity: 0; } }
+
+  /* Garden Maths cover: sunny garden */
+  .cover.garden { background: linear-gradient(180deg, #a8d8f0 0%, #d6ecc0 55%, #6aa74f 100%); }
+  .cover.garden .flower {
+    position: absolute; bottom: 6px;
+    transform-origin: 50% 100%;
+    animation: sway2 3.4s ease-in-out infinite;
+  }
+  @keyframes sway2 { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 
   .card-body { padding: 20px 24px 24px; }
   .card-body h2 {
@@ -180,6 +189,21 @@
         <h2>Deep Sea Numbers</h2>
         <p>Dive your submarine down to the reef and help the sea creatures count, compare and add up their pearls.</p>
         <span class="badge">Numbers &amp; counting</span>
+      </div>
+    </a>
+
+    <a class="game-card" href="garden-maths/">
+      <div class="cover garden" aria-hidden="true">
+        <span class="flower" style="left:14%; font-size:44px; animation-delay:0s">&#127803;</span>
+        <span class="flower" style="left:46%; font-size:36px; animation-delay:0.9s">&#127801;</span>
+        <span class="flower" style="left:74%; font-size:40px; animation-delay:1.7s">&#127799;</span>
+        <span class="float big" style="top:42%; animation-delay:0.4s">&#127922;</span>
+        <span class="float" style="left:76%; top:16%; font-size:30px; animation-delay:1.2s">&#128029;</span>
+      </div>
+      <div class="card-body">
+        <h2>Garden Maths</h2>
+        <p>Roll the dice and solve the sums to grow your garden &mdash; but watch out, wrong answers bring the pests!</p>
+        <span class="badge">Dice &amp; sums</span>
       </div>
     </a>
   </main>

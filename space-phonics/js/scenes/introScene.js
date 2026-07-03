@@ -45,9 +45,11 @@ export class IntroScene extends Scene {
     this.container.addChild(this.ship);
     tween(this.ship, { y: H - 420 }, 1100, { ease: Ease.outCubic, delay: 500 });
 
-    await wait(700);
-    say(`Hello! I'm ${planet.alien} on ${planet.name}. Can you help load my delivery?`);
-    this.alien.jump();
+    // greet once the fade has lifted and the alien has landed
+    wait(1000).then(() => {
+      say(`Hello! I'm ${planet.alien} on ${planet.name}. Can you help load my delivery?`);
+      this.alien.jump();
+    });
 
     // Let's go!
     this.goBtn = makeButton("Let's go!", { width: 330, height: 96, fontSize: 40 });

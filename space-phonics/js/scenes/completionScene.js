@@ -55,7 +55,13 @@ export class CompletionScene extends Scene {
     this.rocket.y = H - 260;
     this.container.addChild(this.rocket);
 
-    await wait(400);
+    // Run the cutscene AFTER enter() returns so it plays in view rather
+    // than behind the scene-transition fade.
+    this.runSequence().catch(console.error);
+  }
+
+  async runSequence() {
+    await wait(700); // let the fade lift
     if (this.perfect) await this.perfectSequence();
     else await this.imperfectSequence();
   }

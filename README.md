@@ -9,6 +9,7 @@ storybook hub page (`index.html` at the repo root).
 |---|---|---|
 | [Space Phonics](space-phonics/) | Letters & phonics (Letters and Sounds progression) | PixiJS v8, no build step |
 | [Deep Sea Numbers](deep-sea-numbers/) | Numbers & counting (count → compare → add/subtract) | PixiJS v8, no build step |
+| [Garden Maths](garden-maths/) | Dice-rolled sums grow a garden; wrong answers breed pests | PixiJS v8, no build step |
 
 ## Running
 
