@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clover Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #fdf6e9;
+    --paper-deep: #f7ebd5;
+    --ink: #4a3b2a;
+    --ink-soft: #8a7a63;
+    --clover: #5aa653;
+    --clover-deep: #3f7f3a;
+    --sun: #f7c948;
+  }
+  html, body { min-height: 100%; }
+  body {
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #fff3d6 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, #eaf3e2 0%, transparent 55%),
+      var(--paper);
+    font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(20px, 4vw, 56px) clamp(16px, 4vw, 48px) 64px;
+  }
+
+  /* ---- header ---- */
+  header { text-align: center; margin-bottom: clamp(28px, 5vw, 56px); }
+  .clover {
+    display: inline-block;
+    font-size: clamp(44px, 8vw, 72px);
+    filter: drop-shadow(0 4px 0 rgba(74, 59, 42, 0.15));
+    animation: sway 4s ease-in-out infinite;
+    transform-origin: 50% 90%;
+  }
+  @keyframes sway { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+  h1 {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: clamp(38px, 7vw, 64px);
+    color: var(--clover-deep);
+    letter-spacing: 1px;
+    text-shadow: 0 3px 0 rgba(74, 59, 42, 0.12);
+  }
+  .tagline {
+    margin-top: 10px;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  /* ---- game shelf ---- */
+  main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 380px));
+    gap: clamp(20px, 3.5vw, 40px);
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+  }
+  .game-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: #fffdf7;
+    border: 4px solid var(--ink);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 8px 0 rgba(74, 59, 42, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .game-card:hover, .game-card:focus-visible {
+    transform: translateY(-6px) rotate(-0.5deg);
+    box-shadow: 0 14px 0 rgba(74, 59, 42, 0.25);
+  }
+  .game-card:active { transform: translateY(2px); box-shadow: 0 4px 0 rgba(74, 59, 42, 0.25); }
+
+  .cover {
+    height: 190px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid var(--ink);
+  }
+  .cover .big {
+    position: absolute;
+    font-size: 92px;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -52%);
+    filter: drop-shadow(0 5px 4px rgba(0,0,0,0.3));
+  }
+  .cover .float { position: absolute; animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+
+  /* Space Phonics cover: night sky */
+  .cover.space { background: linear-gradient(180deg, #0a0a2e 0%, #232364 100%); }
+  .cover.space .star { position: absolute; color: #fff; opacity: 0.9; }
+
+  /* Deep Sea Numbers cover: underwater */
+  .cover.sea { background: linear-gradient(180deg, #2aa4d8 0%, #0b4f8f 100%); }
+  .cover.sea .bubble {
+    position: absolute; bottom: -20px;
+    border: 3px solid rgba(255,255,255,0.7);
+    border-radius: 50%;
+    animation: rise 5s linear infinite;
+  }
+  @keyframes rise { to { transform: translateY(-240px); opacity: 0; } }
+
+  .card-body { padding: 20px 24px 24px; }
+  .card-body h2 {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 27px;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .card-body p { font-weight: 500; color: var(--ink-soft); line-height: 1.45; }
+  .badge {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 16px;
+    color: #fff;
+    background: var(--clover);
+    border: 3px solid var(--clover-deep);
+    border-radius: 999px;
+    padding: 7px 20px;
+    box-shadow: 0 3px 0 var(--clover-deep);
+  }
+
+  footer {
+    margin-top: clamp(36px, 6vw, 64px);
+    color: var(--ink-soft);
+    font-weight: 500;
+    font-size: 14px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <span class="clover" aria-hidden="true">&#127808;</span>
+    <h1>Clover Games</h1>
+    <p class="tagline">Little adventures for growing minds</p>
+  </header>
+
+  <main>
+    <a class="game-card" href="space-phonics/">
+      <div class="cover space" aria-hidden="true">
+        <span class="star" style="left:12%; top:18%; font-size:14px;">&#10022;</span>
+        <span class="star" style="left:80%; top:12%; font-size:20px;">&#10022;</span>
+        <span class="star" style="left:68%; top:64%; font-size:12px;">&#10022;</span>
+        <span class="star" style="left:24%; top:70%; font-size:16px;">&#10022;</span>
+        <span class="star" style="left:90%; top:44%; font-size:13px;">&#10022;</span>
+        <span class="float big" style="animation-delay:0.2s">&#128640;</span>
+        <span class="float" style="left:14%; top:36%; font-size:34px; animation-delay:1s">&#129302;</span>
+      </div>
+      <div class="card-body">
+        <h2>Space Phonics</h2>
+        <p>Fly your rocket across the universe and deliver cargo to friendly aliens by sounding out letters and words.</p>
+        <span class="badge">Letters &amp; sounds</span>
+      </div>
+    </a>
+
+    <a class="game-card" href="deep-sea-numbers/">
+      <div class="cover sea" aria-hidden="true">
+        <span class="bubble" style="left:16%; width:14px; height:14px; animation-delay:0s"></span>
+        <span class="bubble" style="left:34%; width:9px;  height:9px;  animation-delay:1.4s"></span>
+        <span class="bubble" style="left:72%; width:16px; height:16px; animation-delay:0.7s"></span>
+        <span class="bubble" style="left:86%; width:10px; height:10px; animation-delay:2.2s"></span>
+        <span class="float big" style="animation-delay:0.5s">&#128031;</span>
+        <span class="float" style="left:16%; top:52%; font-size:34px; animation-delay:1.6s">&#129425;</span>
+      </div>
+      <div class="card-body">
+        <h2>Deep Sea Numbers</h2>
+        <p>Dive your submarine down to the reef and help the sea creatures count, compare and add up their pearls.</p>
+        <span class="badge">Numbers &amp; counting</span>
+      </div>
+    </a>
+  </main>
+
+  <footer>Pick a game to play &mdash; your progress is saved on this device.</footer>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Space Phonics</title>
+<title>Deep Sea Numbers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
   html, body {
     width: 100%; height: 100%;
     overflow: hidden;
-    background: #0a0a2e;
+    background: #06294e;
     touch-action: none;
     -webkit-user-select: none; user-select: none;
   }
@@ -23,7 +23,7 @@
   #hub-btn {
     position: fixed; top: 14px; left: 14px; z-index: 20;
     font-family: 'Fredoka One', sans-serif;
-    font-size: 18px; color: #0a0a2e;
+    font-size: 18px; color: #06294e;
     background: #ffd75e;
     border: 3px solid #b8860b;
     border-radius: 14px;
@@ -38,7 +38,7 @@
   /* ---- Loading screen ---- */
   #loading {
     position: fixed; inset: 0; z-index: 50;
-    background: #0a0a2e;
+    background: linear-gradient(180deg, #1583c0 0%, #06294e 100%);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     gap: 28px;
@@ -51,22 +51,22 @@
     text-shadow: 0 0 24px rgba(255, 215, 94, 0.5);
     letter-spacing: 2px;
   }
-  #load-rocket { font-size: 56px; animation: bob 1.2s ease-in-out infinite; }
-  @keyframes bob { 0%,100% { transform: translateY(0) rotate(-45deg); } 50% { transform: translateY(-14px) rotate(-45deg); } }
+  #load-sub { font-size: 56px; animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
   #load-track {
     width: min(60vw, 420px); height: 26px;
-    background: #1a1a4e;
-    border: 3px solid #3a3a7e;
+    background: #0a3a66;
+    border: 3px solid #2a6a9e;
     border-radius: 14px;
     overflow: hidden;
   }
   #load-bar {
     height: 100%; width: 0%;
-    background: linear-gradient(90deg, #ff9d5c, #ffd75e);
+    background: linear-gradient(90deg, #4cc9f0, #ffd75e);
     border-radius: 10px;
     transition: width 0.15s;
   }
-  #load-msg { color: #8888c8; font-size: 16px; }
+  #load-msg { color: #8fc3e8; font-size: 16px; }
 </style>
 </head>
 <body>
@@ -74,13 +74,13 @@
   <a id="hub-btn" href="../index.html" title="Back to the hub">&#8962; Hub</a>
 
   <div id="loading">
-    <div id="load-rocket">&#128640;</div>
-    <h1>SPACE PHONICS</h1>
+    <div id="load-sub">&#128031;</div>
+    <h1>DEEP SEA NUMBERS</h1>
     <div id="load-track"><div id="load-bar"></div></div>
-    <div id="load-msg">Fuelling the rocket&hellip;</div>
+    <div id="load-msg">Filling the ballast tanks&hellip;</div>
   </div>
 
-  <!-- PixiJS v8 from CDN, with a vendored copy (v8.19.0) as offline fallback -->
+  <!-- PixiJS v8 from CDN, with a vendored copy as offline fallback -->
   <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"
           onerror="var s=document.createElement('script');s.src='../vendor/pixi.min.js';document.head.appendChild(s);"></script>
   <script type="module" src="js/main.js"></script>
