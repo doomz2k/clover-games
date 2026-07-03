@@ -18,7 +18,7 @@ import { CompletionScene } from './completionScene.js';
 const CARD_W = 272;
 const CARD_H = 226;
 const CHOICE_X = [320, 640, 960];
-const CHOICE_Y = 618;
+const CHOICE_Y = 632;
 
 export class QuestionScene extends Scene {
   async enter({ planet }) {
@@ -52,7 +52,7 @@ export class QuestionScene extends Scene {
     icon.width = icon.height = 52;
     this.previewBtn.addChild(icon);
     this.previewBtn.x = W / 2;
-    this.previewBtn.y = 218;
+    this.previewBtn.y = 208;
     this.previewBtn.on('pointertap', () => this.speakPrompt(true));
     this.container.addChild(this.previewBtn);
 
@@ -71,7 +71,7 @@ export class QuestionScene extends Scene {
 
     this.stimulusHolder = new PIXI.Container();
     this.stimulusHolder.x = W / 2;
-    this.stimulusHolder.y = 396;
+    this.stimulusHolder.y = 386;
     this.choicesHolder = new PIXI.Container();
     this.container.addChild(this.stimulusHolder, this.choicesHolder);
 
@@ -103,10 +103,10 @@ export class QuestionScene extends Scene {
       const glow = makeGlowText(q.stimulus.value, 150);
       this.stimulusHolder.addChild(glow);
     } else {
-      const card = makeCard(300, 268);
+      const card = makeCard(282, 246);
       const pic = new PIXI.Sprite(textureFor(q.stimulus.value));
       pic.anchor.set(0.5);
-      pic.width = pic.height = 210;
+      pic.width = pic.height = 195;
       card.addChild(pic);
       this.stimulusHolder.addChild(card);
     }
