@@ -24,6 +24,31 @@ import { SeasonCompleteScene } from './seasonComplete.js';
 
 const PLANT_X = [280, 640, 1000];
 const CARE_ICON = { sun: 'icon_sun', water: 'icon_drop', nutrients: 'icon_orb' };
+
+// Small round speaker chip in a card's corner: hear the choice without
+// selecting it (the tap must not bubble up into the card's answer handler).
+function makePreviewChip(onTap) {
+  const chip = new PIXI.Container();
+  const bg = new PIXI.Graphics()
+    .circle(0, 3, 18).fill(0xb8860b)
+    .circle(0, 0, 18).fill(0xffd75e)
+    .circle(0, 0, 18).stroke({ width: 3, color: 0xb8860b });
+  const icon = new PIXI.Sprite(textureFor('sound'));
+  icon.anchor.set(0.5);
+  icon.width = icon.height = 20;
+  chip.addChild(bg, icon);
+  chip.eventMode = 'static';
+  chip.cursor = 'pointer';
+  chip.hitArea = new PIXI.Circle(0, 0, 23);
+  chip.on('pointertap', (e) => {
+    e.stopPropagation();
+    sfxTap();
+    onTap();
+  });
+  chip.on('pointerdown', (e) => e.stopPropagation());
+  chip.on('pointerup', (e) => e.stopPropagation());
+  return chip;
+}
 const CORRECT_LINES = ['Brilliant! Your plant loves it!', "That's right! Wonderful!", 'Brilliant! Look at it grow!'];
 const WRONG_LINES = ['Ooh, not quite - try again!', 'Have another go!'];
 
@@ -74,7 +99,7 @@ export class GardenScene extends Scene {
     this.container.addChild(title);
     this.counter = makeText('', 24, { fill: 0xffffff });
     this.counter.anchor.set(1, 0);
-    this.counter.x = W - 24;
+    this.counter.x = W - 84; // clear of the fullscreen button overlay
     this.counter.y = 20;
     this.container.addChild(this.counter);
 
@@ -248,6 +273,13 @@ export class GardenScene extends Scene {
       card.eventMode = 'static';
       card.cursor = 'pointer';
       card.on('pointertap', () => onTap(card));
+
+      // preview chip: hear this number without selecting it
+      const chip = makePreviewChip(() => say(String(choice.value), { interrupt: true }));
+      chip.x = card.cardW / 2 - 22;
+      chip.y = -card.cardH / 2 + 22;
+      card.addChild(chip);
+
       holder.addChild(card);
       cards.push(card);
       popIn(card, 90 + i * 90);
@@ -523,6 +555,10 @@ export class GardenScene extends Scene {
         card.choice = choice;
         card.eventMode = 'static';
         card.cursor = 'pointer';
+        const chip = makePreviewChip(() => say(String(choice.value), { interrupt: true }));
+        chip.x = card.cardW / 2 - 20;
+        chip.y = -card.cardH / 2 + 20;
+        card.addChild(chip);
         card.on('pointertap', async () => {
           if (this.phase !== 'bonus') return;
           if (card.choice.correct) {

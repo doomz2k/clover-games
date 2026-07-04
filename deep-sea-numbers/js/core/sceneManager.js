@@ -22,6 +22,11 @@ export class SceneManager {
     this.app = app;
     this.current = null;
 
+    // Full-window deep-water backdrop behind the letterboxed stage, so the
+    // game always fills the entire browser window instead of showing bars.
+    this.bleed = new PIXI.Graphics();
+    app.stage.addChild(this.bleed);
+
     // stage → root (scaled) → [sceneLayer, particleLayer, fade]
     this.root = new PIXI.Container();
     this.sceneLayer = new PIXI.Container();
@@ -46,6 +51,16 @@ export class SceneManager {
     this.root.scale.set(scale);
     this.root.x = (sw - W * scale) / 2;
     this.root.y = (sh - H * scale) / 2;
+
+    // repaint the window-filling backdrop (water + faint bubbles)
+    this.bleed.clear();
+    this.bleed.rect(0, 0, sw, sh).fill(0x06294e);
+    const seeded = (n) => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
+    const count = Math.floor((sw * sh) / 16000);
+    for (let i = 0; i < count; i++) {
+      this.bleed.circle(seeded(i + 1) * sw, seeded(i + 101) * sh, 2 + seeded(i + 201) * 4)
+        .stroke({ width: 1.5, color: 0xffffff, alpha: 0.1 + seeded(i + 401) * 0.2 });
+    }
   }
 
   /** Cross-fade to a new scene instance. */

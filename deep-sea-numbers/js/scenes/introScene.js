@@ -56,7 +56,7 @@ export class IntroScene extends Scene {
 
     // greet once the fade has lifted and the creature has swum in
     wait(1000).then(() => {
-      say(`Hello! I'm ${level.creature} at ${level.name}. Can you help me collect my pearls?`);
+      say(`Hello! I'm ${level.creature} at ${level.name}. Can you help me collect my pearls?`, { profile: 'alien' });
       this.creature.jump();
     });
 

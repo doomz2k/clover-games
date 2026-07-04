@@ -9,11 +9,11 @@ import { makeReef } from '../gen/reefGenerator.js';
 import { makePearlRack } from '../core/pearlRack.js';
 import { textureFor } from '../core/assets.js';
 import { buildQuestions } from '../data/questions.js';
-import { LEVELS } from '../data/levels.js';
+import { LEVELS, SPECIES, NUMBER_WORDS } from '../data/levels.js';
 import { tween, Ease, wait } from '../core/tween.js';
 import { say, stopSpeech } from '../core/speech.js';
 import { burst } from '../core/particles.js';
-import { sfxCorrect, sfxCorrectSoft, sfxBoing, sfxFanfare } from '../core/audio.js';
+import { sfxCorrect, sfxCorrectSoft, sfxBoing, sfxFanfare, sfxTap } from '../core/audio.js';
 import { CompletionScene } from './completionScene.js';
 
 const CARD_W = 272;
@@ -63,7 +63,7 @@ export class QuestionScene extends Scene {
 
     this.counter = makeText('', 26, { fill: 0x8fc3e8 });
     this.counter.anchor.set(1, 0);
-    this.counter.x = W - 26;
+    this.counter.x = W - 84; // clear of the fullscreen button overlay
     this.counter.y = 20;
     this.container.addChild(this.counter);
 
@@ -80,6 +80,16 @@ export class QuestionScene extends Scene {
 
   speakPrompt(interrupt = false) {
     say(this.q.prompt, { interrupt });
+  }
+
+  // Speak one answer choice aloud (preview chips).
+  speakChoice(choice) {
+    if (choice.kind === 'numeral') {
+      say(NUMBER_WORDS[choice.value] ?? String(choice.value), { interrupt: true });
+    } else {
+      const sp = SPECIES.find((s) => s.key === choice.species);
+      say(`${NUMBER_WORDS[choice.count] ?? choice.count} ${choice.count === 1 ? sp.word : sp.plural}`, { interrupt: true });
+    }
   }
 
   // ---------- rendering ----------
@@ -165,6 +175,13 @@ export class QuestionScene extends Scene {
       card.on('pointertap', () => this.handleAnswer(card));
       card.on('pointerover', () => { if (!this.busy) tween(card.scale, { x: 1.05, y: 1.05 }, 120); });
       card.on('pointerout', () => tween(card.scale, { x: 1, y: 1 }, 120));
+
+      // preview chip: hear this choice without selecting it
+      const chip = makePreviewChip(() => this.speakChoice(choice));
+      chip.x = CARD_W / 2 - 28;
+      chip.y = -CARD_H / 2 + 28;
+      card.addChild(chip);
+
       this.choicesHolder.addChild(card);
       this.cards.push(card);
       popIn(card, 120 + i * 110);
@@ -198,10 +215,10 @@ export class QuestionScene extends Scene {
     this.creature.jump();
     if (firstTry) {
       sfxCorrect();
-      say("Brilliant! That's right!", { interrupt: true });
+      say("Brilliant! That's right!", { interrupt: true, profile: 'alien' });
     } else {
       sfxCorrectSoft();
-      say('Well done - keep going!', { interrupt: true });
+      say('Well done - keep going!', { interrupt: true, profile: 'alien' });
     }
 
     for (const other of this.cards) {
@@ -235,10 +252,10 @@ export class QuestionScene extends Scene {
     card.setBorder(COLORS.cardBorder, 6);
 
     if (this.wrongCount === 1) {
-      say('Ooh, not quite - have another go!', { interrupt: true });
+      say('Ooh, not quite - have another go!', { interrupt: true, profile: 'alien' });
       this.busy = false;
     } else if (this.wrongCount === 2) {
-      say('Let me give you a clue...', { interrupt: true });
+      say('Let me give you a clue...', { interrupt: true, profile: 'alien' });
       for (const other of this.cards) {
         if (!other.choice.correct) tween(other, { alpha: 0.4 }, 350);
       }
@@ -288,6 +305,31 @@ export class QuestionScene extends Scene {
 // ---------------------------------------------------------------------------
 // helpers
 // ---------------------------------------------------------------------------
+
+// Small round speaker chip in a card's corner: hear the choice without
+// selecting it (the tap must not bubble up into the card's answer handler).
+function makePreviewChip(onTap) {
+  const chip = new PIXI.Container();
+  const bg = new PIXI.Graphics()
+    .circle(0, 3, 21).fill(0xb8860b)
+    .circle(0, 0, 21).fill(0xffd75e)
+    .circle(0, 0, 21).stroke({ width: 3, color: 0xb8860b });
+  const icon = new PIXI.Sprite(textureFor('sound'));
+  icon.anchor.set(0.5);
+  icon.width = icon.height = 24;
+  chip.addChild(bg, icon);
+  chip.eventMode = 'static';
+  chip.cursor = 'pointer';
+  chip.hitArea = new PIXI.Circle(0, 0, 26);
+  chip.on('pointertap', (e) => {
+    e.stopPropagation();
+    sfxTap();
+    onTap();
+  });
+  chip.on('pointerdown', (e) => e.stopPropagation());
+  chip.on('pointerup', (e) => e.stopPropagation());
+  return chip;
+}
 
 // Lay out `count` object sprites in tens-frame rows (up to 5 per row),
 // centred on (0,0). Returns a container with .groupW for composition.

@@ -130,7 +130,7 @@ export class MapScene extends Scene {
     title.y = 18;
     this.container.addChild(title);
 
-    this.mkArrow('▲', -1, 84);
+    this.mkArrow('▲', -1, 148); // below the fullscreen button overlay
     this.mkArrow('▼', 1, H - 84);
 
     // Drag to scroll (vertical)
