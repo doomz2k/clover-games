@@ -1,9 +1,11 @@
 name: Deploy to GitHub Pages
 
-# Mirrors main to the gh-pages branch. GitHub Pages auto-enables for a
-# gh-pages branch on a public repo, which avoids needing the API permission
-# to create the Pages site (the actions/deploy-pages route failed with
-# "Resource not accessible by integration").
+# Publishes the site both ways, so it works whichever Pages source is
+# selected in Settings -> Pages:
+#   - mirror job: keeps the gh-pages branch current ("Deploy from a branch")
+#   - actions-deploy job: deploys via the Pages API ("GitHub Actions" source);
+#     tolerated to fail while the Pages site doesn't exist yet, since the
+#     workflow token is not allowed to create the site itself.
 
 on:
   push:
@@ -12,13 +14,15 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  publish:
+  mirror:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
@@ -28,8 +32,30 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # .nojekyll: serve files as-is (no Jekyll processing of folders)
+          # .nojekyll: serve files as-is (no Jekyll processing)
           touch .nojekyll
           git add .nojekyll
           git commit -m "Publish site" --allow-empty
           git push --force origin HEAD:gh-pages
+
+  actions-deploy:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
