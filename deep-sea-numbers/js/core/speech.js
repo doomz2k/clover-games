@@ -4,6 +4,8 @@
 //              properly weird and otherworldly
 // Gracefully no-ops when speech synthesis is unavailable.
 
+import { isMuted } from './audio.js';
+
 const PREFERRED_MALE = [
   'Google UK English Male',
   'Microsoft Ryan - English (United Kingdom)',
@@ -68,7 +70,7 @@ function pump() {
  * Resolves when spoken (immediately if speech is unavailable).
  */
 export function say(text, opts = {}) {
-  if (!('speechSynthesis' in window)) return Promise.resolve();
+  if (!('speechSynthesis' in window) || isMuted()) return Promise.resolve();
   if (opts.interrupt) stopSpeech();
   return new Promise((resolve) => {
     queue.push({ text, profile: opts.profile || 'narrator', resolve });

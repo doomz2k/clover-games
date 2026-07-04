@@ -5,7 +5,8 @@ import { preloadAll } from './core/assets.js';
 import { initTweens } from './core/tween.js';
 import { initParticles } from './core/particles.js';
 import { initSpeech } from './core/speech.js';
-import { unlock as unlockAudio } from './core/audio.js';
+import { unlock as unlockAudio, isMuted, toggleMute } from './core/audio.js';
+import { startMusic, SONG } from './core/music.js';
 import { SceneManager } from './core/sceneManager.js';
 import { MapScene } from './scenes/mapScene.js';
 
@@ -48,7 +49,18 @@ async function boot() {
 
   initTweens(app);
   initSpeech();
-  window.addEventListener('pointerdown', unlockAudio, { once: true });
+  window.addEventListener('pointerdown', () => {
+    unlockAudio();
+    startMusic(SONG);
+  }, { once: true });
+
+  // mute toggle (persists across all Clover games)
+  const muteBtn = document.getElementById('mute-btn');
+  if (muteBtn) {
+    const paint = () => { muteBtn.textContent = isMuted() ? '\u{1F507}' : '\u{1F50A}'; };
+    muteBtn.addEventListener('click', () => { toggleMute(); paint(); });
+    paint();
+  }
 
   const scenes = new SceneManager(app);
   initParticles(app, scenes.particleLayer);

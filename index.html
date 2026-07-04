@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clover Games</title>
+<meta name="description" content="Little learning adventures: phonics, numbers and maths games for young children.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#5aa653">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
@@ -100,7 +106,24 @@
 
   /* Space Phonics cover: night sky */
   .cover.space { background: linear-gradient(180deg, #0a0a2e 0%, #232364 100%); }
-  .cover.space .star { position: absolute; color: #fff; opacity: 0.9; }
+  .cover.space .star {
+    position: absolute; color: #fff; opacity: 0.9;
+    animation: twinkle 2.2s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: 0.25; } to { opacity: 1; } }
+
+  /* progress badge (earned stars), filled in by the script below */
+  .progress {
+    display: none;
+    position: absolute; top: 12px; right: 12px;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 15px; color: #4a3b2a;
+    background: #ffd75e;
+    border: 3px solid #b8860b;
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+  .cover { position: relative; }
 
   /* Deep Sea Numbers cover: underwater */
   .cover.sea { background: linear-gradient(180deg, #2aa4d8 0%, #0b4f8f 100%); }
@@ -168,6 +191,7 @@
         <span class="star" style="left:90%; top:44%; font-size:13px;">&#10022;</span>
         <span class="float big" style="animation-delay:0.2s">&#128640;</span>
         <span class="float" style="left:14%; top:36%; font-size:34px; animation-delay:1s">&#129302;</span>
+        <span class="progress" data-store="spacephonics_progress" data-list="planets" data-max="39"></span>
       </div>
       <div class="card-body">
         <h2>Space Phonics</h2>
@@ -184,6 +208,7 @@
         <span class="bubble" style="left:86%; width:10px; height:10px; animation-delay:2.2s"></span>
         <span class="float big" style="animation-delay:0.5s">&#128031;</span>
         <span class="float" style="left:16%; top:52%; font-size:34px; animation-delay:1.6s">&#129425;</span>
+        <span class="progress" data-store="deepseanumbers_progress" data-list="levels" data-max="36"></span>
       </div>
       <div class="card-body">
         <h2>Deep Sea Numbers</h2>
@@ -199,6 +224,7 @@
         <span class="flower" style="left:74%; font-size:40px; animation-delay:1.7s">&#127799;</span>
         <span class="float big" style="top:42%; animation-delay:0.4s">&#127922;</span>
         <span class="float" style="left:76%; top:16%; font-size:30px; animation-delay:1.2s">&#128029;</span>
+        <span class="progress" data-store="gardenMaths_progress" data-list="seasons" data-max="18"></span>
       </div>
       <div class="card-body">
         <h2>Garden Maths</h2>
@@ -209,5 +235,21 @@
   </main>
 
   <footer>Pick a game to play &mdash; your progress is saved on this device.</footer>
+
+  <script>
+    // Show each game's earned stars on its card (read from that game's save).
+    for (const el of document.querySelectorAll('.progress')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(el.dataset.store) || 'null');
+        const list = data && data[el.dataset.list];
+        if (!Array.isArray(list)) continue;
+        const stars = list.reduce((sum, item) => sum + (item.stars | 0), 0);
+        if (stars > 0) {
+          el.textContent = '⭐ ' + stars + ' / ' + el.dataset.max;
+          el.style.display = 'inline-block';
+        }
+      } catch (e) { /* no save yet */ }
+    }
+  </script>
 </body>
 </html>

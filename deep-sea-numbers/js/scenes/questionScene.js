@@ -63,7 +63,7 @@ export class QuestionScene extends Scene {
 
     this.counter = makeText('', 26, { fill: 0x8fc3e8 });
     this.counter.anchor.set(1, 0);
-    this.counter.x = W - 84; // clear of the fullscreen button overlay
+    this.counter.x = W - 146; // clear of the mute + fullscreen buttons
     this.counter.y = 20;
     this.container.addChild(this.counter);
 

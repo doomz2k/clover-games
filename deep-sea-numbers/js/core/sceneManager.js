@@ -1,5 +1,6 @@
 // Scene manager: owns the logical 1280x800 stage, letterbox scaling, and
-// fade transitions between the Map / Intro / Question / Completion scenes.
+// the themed "bubble wall" transition between scenes - a curtain of rising
+// bubbles covers the old scene, then floats away to reveal the new one.
 
 import { tween, Ease } from './tween.js';
 
@@ -27,14 +28,28 @@ export class SceneManager {
     this.bleed = new PIXI.Graphics();
     app.stage.addChild(this.bleed);
 
-    // stage → root (scaled) → [sceneLayer, particleLayer, fade]
+    // stage → root (scaled) → [sceneLayer, particleLayer, overlay]
     this.root = new PIXI.Container();
     this.sceneLayer = new PIXI.Container();
     this.particleLayer = new PIXI.Container();
-    this.fade = new PIXI.Graphics().rect(-W, -H, W * 3, H * 3).fill(0x05051a);
-    this.fade.alpha = 0;
-    this.fade.eventMode = 'none';
-    this.root.addChild(this.sceneLayer, this.particleLayer, this.fade);
+
+    // themed transition overlay: deep water + a wall of rising bubbles
+    this.overlay = new PIXI.Container();
+    this.overlayBg = new PIXI.Graphics().rect(-W, -H, W * 3, H * 3).fill(0x041a33);
+    this.overlayBg.alpha = 0;
+    this.overlayFx = new PIXI.Graphics();
+    this.overlay.addChild(this.overlayBg, this.overlayFx);
+    this.overlay.eventMode = 'none';
+    this.bubbles = [];
+    for (let i = 0; i < 52; i++) {
+      this.bubbles.push({
+        x: Math.random() * W,
+        r: 24 + Math.random() * 58,
+        ph: Math.random() * 0.35,
+      });
+    }
+
+    this.root.addChild(this.sceneLayer, this.particleLayer, this.overlay);
     app.stage.addChild(this.root);
 
     const onResize = () => this.layout();
@@ -63,10 +78,26 @@ export class SceneManager {
     }
   }
 
-  /** Cross-fade to a new scene instance. */
+  drawTransition(p) {
+    this.overlayBg.alpha = Math.min(1, p * 1.5);
+    const g = this.overlayFx;
+    g.clear();
+    if (p <= 0.01) return;
+    for (const b of this.bubbles) {
+      const t = Math.max(0, Math.min(1, p * 1.35 - b.ph));
+      if (t <= 0) continue;
+      const y = (H + 140) - t * (H + 280);
+      g.circle(b.x, y, b.r).fill({ color: 0x2a7fb8, alpha: 0.35 });
+      g.circle(b.x, y, b.r).stroke({ width: 3, color: 0xbfe8f9, alpha: 0.6 });
+      g.circle(b.x - b.r * 0.3, y - b.r * 0.3, b.r * 0.25).fill({ color: 0xffffff, alpha: 0.5 });
+    }
+  }
+
+  /** Bubble-wall to a new scene instance. */
   async switchTo(scene, data) {
-    this.fade.eventMode = 'static'; // swallow input during the transition
-    await tween(this.fade, { alpha: 1 }, 350, { ease: Ease.inQuad });
+    this.overlay.eventMode = 'static'; // swallow input during the transition
+    const s = { p: 0 };
+    await tween(s, { p: 1 }, 430, { ease: Ease.inQuad, onUpdate: () => this.drawTransition(s.p) });
     if (this.current) {
       await this.current.exit();
       this.sceneLayer.removeChild(this.current.container);
@@ -75,7 +106,8 @@ export class SceneManager {
     this.current = scene;
     this.sceneLayer.addChild(scene.container);
     await scene.enter(data);
-    await tween(this.fade, { alpha: 0 }, 350, { ease: Ease.outQuad });
-    this.fade.eventMode = 'none';
+    await tween(s, { p: 0 }, 380, { ease: Ease.outQuad, onUpdate: () => this.drawTransition(s.p) });
+    this.overlayFx.clear();
+    this.overlay.eventMode = 'none';
   }
 }

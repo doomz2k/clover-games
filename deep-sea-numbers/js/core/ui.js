@@ -109,14 +109,24 @@ export function makeOcean(viewW, viewH, worldHeight = 0, { depthT = 0 } = {}) {
   const container = new PIXI.Container();
   const totalH = worldHeight + viewH;
 
-  // --- gradient water (factor 1) ---
+  // --- gradient water (factor 1): a true smooth gradient, no banding ---
   const grad = new PIXI.Graphics();
-  const bands = 24;
-  for (let i = 0; i < bands; i++) {
-    const t0 = i / bands;
-    const from = worldHeight > 0 ? t0 : lerp(depthT * 0.75, depthT * 0.75 + 0.25, t0);
-    grad.rect(0, t0 * totalH, viewW, totalH / bands + 2).fill(waterColor(from));
+  const stops = [];
+  for (let i = 0; i <= 6; i++) {
+    const k = i / 6;
+    stops.push({
+      offset: k,
+      color: waterColor(worldHeight > 0 ? k : lerp(depthT * 0.75, depthT * 0.75 + 0.25, k)),
+    });
   }
+  const waterFill = new PIXI.FillGradient({
+    type: 'linear',
+    start: { x: 0, y: 0 },
+    end: { x: 0, y: 1 },
+    textureSpace: 'local',
+    colorStops: stops,
+  });
+  grad.rect(0, 0, viewW, totalH).fill(waterFill);
   container.addChild(grad);
 
   // --- light rays near the surface ---

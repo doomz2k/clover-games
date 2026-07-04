@@ -103,12 +103,20 @@ function mixRgb(a, b, t) {
 }
 
 function drawSky(g, pal, w, h) {
-  const bands = 14;
+  // a true smooth vertical gradient - no banding
   g.clear();
-  for (let i = 0; i < bands; i++) {
-    const t = i / (bands - 1);
-    g.rect(0, (i / bands) * h, w, h / bands + 2).fill(mixRgb(pal[0], pal[1], t));
-  }
+  const fill = new PIXI.FillGradient({
+    type: 'linear',
+    start: { x: 0, y: 0 },
+    end: { x: 0, y: 1 },
+    textureSpace: 'local',
+    colorStops: [
+      { offset: 0, color: mixRgb(pal[0], pal[1], 0) },
+      { offset: 0.55, color: mixRgb(pal[0], pal[1], 0.5) },
+      { offset: 1, color: mixRgb(pal[0], pal[1], 1) },
+    ],
+  });
+  g.rect(0, 0, w, h).fill(fill);
 }
 
 /**

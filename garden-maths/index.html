@@ -7,6 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<meta name="theme-color" content="#5aa653">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body {
@@ -48,6 +53,19 @@
   }
   #fs-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b8860b; }
 
+  #mute-btn {
+    position: fixed; top: 14px; right: 70px; z-index: 20;
+    font-size: 20px;
+    background: #ffd75e;
+    border: 3px solid #b8860b;
+    border-radius: 14px;
+    width: 46px; height: 44px;
+    box-shadow: 0 4px 0 #b8860b;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  #mute-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #b8860b; }
+
   #loading {
     position: fixed; inset: 0; z-index: 50;
     background: linear-gradient(180deg, #ffd9e8 0%, #a8d8f0 45%, #4a7c3f 100%);
@@ -85,6 +103,7 @@
   <div id="game-canvas-holder"></div>
   <a id="hub-btn" href="../index.html" title="Back to the hub">&#8962; Hub</a>
   <button id="fs-btn" title="Full screen">&#x26F6;</button>
+  <button id="mute-btn" title="Sound on/off">&#x1F50A;</button>
   <script>
     // Fullscreen + landscape lock: toggle button always available, and on
     // touch devices the first tap goes fullscreen automatically.

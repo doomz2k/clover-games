@@ -99,7 +99,7 @@ export class GardenScene extends Scene {
     this.container.addChild(title);
     this.counter = makeText('', 24, { fill: 0xffffff });
     this.counter.anchor.set(1, 0);
-    this.counter.x = W - 84; // clear of the fullscreen button overlay
+    this.counter.x = W - 146; // clear of the mute + fullscreen buttons
     this.counter.y = 20;
     this.container.addChild(this.counter);
 

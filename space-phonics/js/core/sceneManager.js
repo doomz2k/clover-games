@@ -1,5 +1,6 @@
 // Scene manager: owns the logical 1280x800 stage, letterbox scaling, and
-// fade transitions between the Map / Intro / Question / Completion scenes.
+// the themed "hyperspace" transition between scenes - star streaks race
+// outward while space swallows the old scene, then recede to reveal the new.
 
 import { tween, Ease } from './tween.js';
 
@@ -27,14 +28,30 @@ export class SceneManager {
     this.bleed = new PIXI.Graphics();
     app.stage.addChild(this.bleed);
 
-    // stage → root (scaled) → [sceneLayer, particleLayer, fade]
+    // stage → root (scaled) → [sceneLayer, particleLayer, overlay]
     this.root = new PIXI.Container();
     this.sceneLayer = new PIXI.Container();
     this.particleLayer = new PIXI.Container();
-    this.fade = new PIXI.Graphics().rect(-W, -H, W * 3, H * 3).fill(0x05051a);
-    this.fade.alpha = 0;
-    this.fade.eventMode = 'none';
-    this.root.addChild(this.sceneLayer, this.particleLayer, this.fade);
+
+    // themed transition overlay: dark space + hyperspace star streaks
+    this.overlay = new PIXI.Container();
+    this.overlayBg = new PIXI.Graphics().rect(-W, -H, W * 3, H * 3).fill(0x05051a);
+    this.overlayBg.alpha = 0;
+    this.overlayFx = new PIXI.Graphics();
+    this.overlay.addChild(this.overlayBg, this.overlayFx);
+    this.overlay.eventMode = 'none';
+    this.streaks = [];
+    for (let i = 0; i < 54; i++) {
+      this.streaks.push({
+        ang: Math.random() * Math.PI * 2,
+        off: Math.random(),
+        len: 140 + Math.random() * 260,
+        w: 1.5 + Math.random() * 3,
+        blue: Math.random() < 0.22,
+      });
+    }
+
+    this.root.addChild(this.sceneLayer, this.particleLayer, this.overlay);
     app.stage.addChild(this.root);
 
     const onResize = () => this.layout();
@@ -63,10 +80,26 @@ export class SceneManager {
     }
   }
 
-  /** Cross-fade to a new scene instance. */
+  drawTransition(p) {
+    this.overlayBg.alpha = Math.min(1, p * 1.6);
+    const g = this.overlayFx;
+    g.clear();
+    if (p <= 0.01) return;
+    const cx = W / 2, cy = H / 2;
+    for (const s of this.streaks) {
+      const r0 = s.off * 260 + p * p * 900;
+      const r1 = r0 + s.len * p;
+      g.moveTo(cx + Math.cos(s.ang) * r0, cy + Math.sin(s.ang) * r0)
+        .lineTo(cx + Math.cos(s.ang) * r1, cy + Math.sin(s.ang) * r1)
+        .stroke({ width: s.w, color: s.blue ? 0xbfe8f9 : 0xffffff, alpha: Math.min(1, p * 1.5) });
+    }
+  }
+
+  /** Hyperspace-jump to a new scene instance. */
   async switchTo(scene, data) {
-    this.fade.eventMode = 'static'; // swallow input during the transition
-    await tween(this.fade, { alpha: 1 }, 350, { ease: Ease.inQuad });
+    this.overlay.eventMode = 'static'; // swallow input during the transition
+    const s = { p: 0 };
+    await tween(s, { p: 1 }, 430, { ease: Ease.inQuad, onUpdate: () => this.drawTransition(s.p) });
     if (this.current) {
       await this.current.exit();
       this.sceneLayer.removeChild(this.current.container);
@@ -75,7 +108,8 @@ export class SceneManager {
     this.current = scene;
     this.sceneLayer.addChild(scene.container);
     await scene.enter(data);
-    await tween(this.fade, { alpha: 0 }, 350, { ease: Ease.outQuad });
-    this.fade.eventMode = 'none';
+    await tween(s, { p: 0 }, 380, { ease: Ease.outQuad, onUpdate: () => this.drawTransition(s.p) });
+    this.overlayFx.clear();
+    this.overlay.eventMode = 'none';
   }
 }

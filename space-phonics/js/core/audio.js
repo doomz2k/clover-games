@@ -5,6 +5,25 @@
 
 let ctx = null;
 
+// ---- master mute (persisted across all Clover games) ----
+let muted = false;
+try { muted = localStorage.getItem('cloverMuted') === '1'; } catch { /* blocked */ }
+const muteListeners = [];
+
+export const isMuted = () => muted;
+
+export function onMuteChange(fn) { muteListeners.push(fn); }
+
+export function toggleMute() {
+  muted = !muted;
+  try { localStorage.setItem('cloverMuted', muted ? '1' : '0'); } catch { /* blocked */ }
+  for (const fn of muteListeners) fn(muted);
+  return muted;
+}
+
+/** The shared AudioContext (null until unlock()). Used by the music engine. */
+export function audioCtx() { return ctx; }
+
 export function unlock() {
   if (!ctx) {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -54,7 +73,7 @@ function noise(start, dur, { vol = 0.2, filterFreq = 1000, filterEnd = null, typ
   src.start(start);
 }
 
-const guard = (fn) => (...args) => { if (ctx && ctx.state === 'running') fn(...args); };
+const guard = (fn) => (...args) => { if (ctx && ctx.state === 'running' && !muted) fn(...args); };
 
 // Bright ascending sine sequence.
 export const sfxCorrect = guard(() => {

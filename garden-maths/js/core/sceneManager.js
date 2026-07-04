@@ -1,10 +1,13 @@
 // Scene manager: owns the logical 1280x800 stage, letterbox scaling, and
-// fade transitions between the Map / Intro / Question / Completion scenes.
+// the themed "leaf sweep" transition between scenes - tumbling leaves blow
+// across to cover the old scene, then clear to reveal the new one.
 
 import { tween, Ease } from './tween.js';
 
 export const W = 1280;
 export const H = 800;
+
+const LEAF_COLORS = [0x4a8a3c, 0x5f9e4a, 0x7ac74f, 0x3f7433];
 
 export class Scene {
   constructor(game) {
@@ -27,14 +30,31 @@ export class SceneManager {
     this.bleed = new PIXI.Graphics();
     app.stage.addChild(this.bleed);
 
-    // stage → root (scaled) → [sceneLayer, particleLayer, fade]
+    // stage → root (scaled) → [sceneLayer, particleLayer, overlay]
     this.root = new PIXI.Container();
     this.sceneLayer = new PIXI.Container();
     this.particleLayer = new PIXI.Container();
-    this.fade = new PIXI.Graphics().rect(-W, -H, W * 3, H * 3).fill(0x05051a);
-    this.fade.alpha = 0;
-    this.fade.eventMode = 'none';
-    this.root.addChild(this.sceneLayer, this.particleLayer, this.fade);
+
+    // themed transition overlay: garden green + wind-blown tumbling leaves
+    this.overlay = new PIXI.Container();
+    this.overlayBg = new PIXI.Graphics().rect(-W, -H, W * 3, H * 3).fill(0x2e5d2a);
+    this.overlayBg.alpha = 0;
+    this.overlayFx = new PIXI.Graphics();
+    this.overlay.addChild(this.overlayBg, this.overlayFx);
+    this.overlay.eventMode = 'none';
+    this.leaves = [];
+    for (let i = 0; i < 46; i++) {
+      this.leaves.push({
+        y: Math.random() * H,
+        wob: 30 + Math.random() * 50,
+        ph: Math.random() * 0.35,
+        size: 16 + Math.random() * 18,
+        rot: Math.random() * Math.PI,
+        col: LEAF_COLORS[i % LEAF_COLORS.length],
+      });
+    }
+
+    this.root.addChild(this.sceneLayer, this.particleLayer, this.overlay);
     app.stage.addChild(this.root);
 
     const onResize = () => this.layout();
@@ -63,10 +83,33 @@ export class SceneManager {
     }
   }
 
-  /** Cross-fade to a new scene instance. */
+  drawTransition(p) {
+    this.overlayBg.alpha = Math.min(1, p * 1.5);
+    const g = this.overlayFx;
+    g.clear();
+    if (p <= 0.01) return;
+    for (const l of this.leaves) {
+      const t = Math.max(0, Math.min(1, p * 1.35 - l.ph));
+      if (t <= 0) continue;
+      const x = -240 + t * (W + 480);
+      const y = l.y + Math.sin(t * 6 + l.rot) * l.wob;
+      const rot = l.rot + t * 7;
+      const c = Math.cos(rot), s = Math.sin(rot);
+      const L = l.size, Wd = l.size * 0.55;
+      g.poly([
+        x + L * c, y + L * s,
+        x - Wd * s, y + Wd * c,
+        x - L * c, y - L * s,
+        x + Wd * s, y - Wd * c,
+      ]).fill({ color: l.col, alpha: 0.95 });
+    }
+  }
+
+  /** Leaf-sweep to a new scene instance. */
   async switchTo(scene, data) {
-    this.fade.eventMode = 'static'; // swallow input during the transition
-    await tween(this.fade, { alpha: 1 }, 350, { ease: Ease.inQuad });
+    this.overlay.eventMode = 'static'; // swallow input during the transition
+    const s = { p: 0 };
+    await tween(s, { p: 1 }, 430, { ease: Ease.inQuad, onUpdate: () => this.drawTransition(s.p) });
     if (this.current) {
       await this.current.exit();
       this.sceneLayer.removeChild(this.current.container);
@@ -75,7 +118,8 @@ export class SceneManager {
     this.current = scene;
     this.sceneLayer.addChild(scene.container);
     await scene.enter(data);
-    await tween(this.fade, { alpha: 0 }, 350, { ease: Ease.outQuad });
-    this.fade.eventMode = 'none';
+    await tween(s, { p: 0 }, 380, { ease: Ease.outQuad, onUpdate: () => this.drawTransition(s.p) });
+    this.overlayFx.clear();
+    this.overlay.eventMode = 'none';
   }
 }
