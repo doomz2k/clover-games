@@ -1,39 +1,35 @@
 name: Deploy to GitHub Pages
 
+# Mirrors main to the gh-pages branch. GitHub Pages auto-enables for a
+# gh-pages branch on a public repo, which avoids needing the API permission
+# to create the Pages site (the actions/deploy-pages route failed with
+# "Resource not accessible by integration").
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Upload site
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Push to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # .nojekyll: serve files as-is (no Jekyll processing of folders)
+          touch .nojekyll
+          git add .nojekyll
+          git commit -m "Publish site" --allow-empty
+          git push --force origin HEAD:gh-pages
