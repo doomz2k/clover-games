@@ -22,6 +22,11 @@ export class SceneManager {
     this.app = app;
     this.current = null;
 
+    // Full-window starfield behind the letterboxed stage, so the game
+    // always fills the entire browser window instead of showing bars.
+    this.bleed = new PIXI.Graphics();
+    app.stage.addChild(this.bleed);
+
     // stage → root (scaled) → [sceneLayer, particleLayer, fade]
     this.root = new PIXI.Container();
     this.sceneLayer = new PIXI.Container();
@@ -46,6 +51,16 @@ export class SceneManager {
     this.root.scale.set(scale);
     this.root.x = (sw - W * scale) / 2;
     this.root.y = (sh - H * scale) / 2;
+
+    // repaint the window-filling backdrop stars
+    this.bleed.clear();
+    this.bleed.rect(0, 0, sw, sh).fill(0x0a0a2e);
+    const seeded = (n) => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
+    const count = Math.floor((sw * sh) / 7000);
+    for (let i = 0; i < count; i++) {
+      this.bleed.circle(seeded(i + 1) * sw, seeded(i + 101) * sh, 0.8 + seeded(i + 201) * 1.8)
+        .fill({ color: seeded(i + 301) < 0.12 ? 0xbfe8f9 : 0xffffff, alpha: 0.35 + seeded(i + 401) * 0.55 });
+    }
   }
 
   /** Cross-fade to a new scene instance. */

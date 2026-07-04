@@ -47,7 +47,7 @@ export class IntroScene extends Scene {
 
     // greet once the fade has lifted and the alien has landed
     wait(1000).then(() => {
-      say(`Hello! I'm ${planet.alien} on ${planet.name}. Can you help load my delivery?`);
+      say(`Hello! I'm ${planet.alien} on ${planet.name}. Can you help load my delivery?`, { profile: 'alien' });
       this.alien.jump();
     });
 
