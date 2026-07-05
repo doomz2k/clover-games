@@ -31,8 +31,9 @@ jobs:
       - name: Download voice model
         run: python -m piper.download_voices en_GB-northern_english_male-medium
 
-      - name: Re-fetch human phoneme recordings (improved trim)
-        run: python tools/fetch_phoneme_clips.py --force
+      # marker file skips already-fetched recordings (gentle on Wikimedia)
+      - name: Fetch human phoneme recordings
+        run: python tools/fetch_phoneme_clips.py
 
       - name: Build candidate renderings
         run: python tools/build_sound_lab.py
