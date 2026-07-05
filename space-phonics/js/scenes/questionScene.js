@@ -167,6 +167,9 @@ export class QuestionScene extends Scene {
       card.on('pointertap', () => this.handleAnswer(card));
       card.on('pointerover', () => { if (!this.busy) tween(card.scale, { x: 1.05, y: 1.05 }, 120); });
       card.on('pointerout', () => tween(card.scale, { x: 1, y: 1 }, 120));
+      card.on('pointerdown', () => tween(card.scale, { x: 0.94, y: 0.94 }, 70));
+      card.on('pointerup', () => tween(card.scale, { x: 1, y: 1 }, 180, { ease: Ease.outBack }));
+      card.on('pointerupoutside', () => tween(card.scale, { x: 1, y: 1 }, 180));
 
       // preview chip: hear this choice without selecting it
       const chip = makePreviewChip(() => this.speakChoice(choice));
@@ -202,7 +205,14 @@ export class QuestionScene extends Scene {
     const globalPos = card.getGlobalPosition();
     const layer = this.game.scenes.particleLayer;
     const local = layer.toLocal(globalPos);
-    burst(local.x, local.y, firstTry ? { count: 52 } : { count: 22, speed: 300 });
+    // streaks make each win bigger: 3-in-a-row adds a second ring,
+    // 5-in-a-row earns a full character celebration
+    this.streak = firstTry ? (this.streak || 0) + 1 : 0;
+    burst(local.x, local.y, firstTry
+      ? { count: Math.min(52 + this.streak * 12, 110) }
+      : { count: 22, speed: 300 });
+    if (this.streak >= 3) burst(local.x, local.y, { count: 22, speed: 430 });
+    if (this.streak === 5) this.alien.celebrate().catch(() => {});
 
     this.alien.setMood('happy');
     this.alien.jump();
@@ -239,6 +249,7 @@ export class QuestionScene extends Scene {
     this.busy = true;
     this.mistakes++;
     this.wrongCount++;
+    this.streak = 0;
     sfxBoing();
     this.alien.wobble();
 

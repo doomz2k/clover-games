@@ -274,6 +274,9 @@ export class GardenScene extends Scene {
       card.eventMode = 'static';
       card.cursor = 'pointer';
       card.on('pointertap', () => onTap(card));
+      card.on('pointerdown', () => tween(card.scale, { x: 0.94, y: 0.94 }, 70));
+      card.on('pointerup', () => tween(card.scale, { x: 1, y: 1 }, 180, { ease: Ease.outBack }));
+      card.on('pointerupoutside', () => tween(card.scale, { x: 1, y: 1 }, 180));
 
       // preview chip: hear this number without selecting it
       const chip = makePreviewChip(() => say(String(choice.value), { interrupt: true }));
@@ -307,7 +310,9 @@ export class GardenScene extends Scene {
     card.setBorder(COLORS.good, 8);
     const layer = this.game.scenes.particleLayer;
     const gp = layer.toLocal(card.getGlobalPosition());
-    burst(gp.x, gp.y, { count: firstTry ? 40 : 20 });
+    this.streak = firstTry ? (this.streak || 0) + 1 : 0;
+    burst(gp.x, gp.y, { count: firstTry ? Math.min(40 + this.streak * 10, 90) : 20 });
+    if (this.streak >= 3) burst(gp.x, gp.y, { count: 18, speed: 420 });
     if (firstTry) sfxCorrect(); else sfxCorrectSoft();
     say(CORRECT_LINES[this.questionsAsked % CORRECT_LINES.length], { interrupt: true });
 
@@ -362,6 +367,7 @@ export class GardenScene extends Scene {
 
   async onWrong(card) {
     this.phase = 'feedback';
+    this.streak = 0;
     this.wrongCount++;
     sfxBoing();
     say(WRONG_LINES[this.wrongCount % WRONG_LINES.length], { interrupt: true });
