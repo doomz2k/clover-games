@@ -29,16 +29,17 @@ jobs:
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg espeak-ng
 
       - name: Download voice model
-        run: python -m piper.download_voices en_GB-northern_english_male-medium
+        run: python -m piper.download_voices en_GB-cori-high
 
-      # marker file skips already-fetched recordings (gentle on Wikimedia)
+      # --force: a full voice re-render overwrites these clips, so restore
+      # the human recordings before re-applying the operator's picks
       - name: Fetch human phoneme recordings
-        run: python tools/fetch_phoneme_clips.py
+        run: python tools/fetch_phoneme_clips.py --force
 
       - name: Build candidate renderings
         run: python tools/build_sound_lab.py
         env:
-          PIPER_VOICE: en_GB-northern_english_male-medium.onnx
+          PIPER_VOICE: en_GB-cori-high.onnx
 
       - name: Apply operator picks
         run: python tools/apply_sound_choices.py

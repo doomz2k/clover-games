@@ -20,7 +20,7 @@ import wave
 
 from piper import PiperVoice, SynthesisConfig
 
-VOICE_PATH = os.environ.get("PIPER_VOICE", "en_GB-northern_english_male-medium.onnx")
+VOICE_PATH = os.environ.get("PIPER_VOICE", "en_GB-cori-high.onnx")
 
 # token -> espeak Kirshenbaum phoneme string (en-GB)
 ESPEAK = {
@@ -76,7 +76,7 @@ def main():
 
         tmp = f"/tmp/lab_{token}_espeak.wav"
         r = subprocess.run(
-            ["espeak-ng", "-v", "en-gb", "-s", "95", "-w", tmp, f"[[{phoneme}]]"])
+            ["espeak-ng", "-v", "en-gb+f3", "-s", "95", "-w", tmp, f"[[{phoneme}]]"])
         if r.returncode == 0 and os.path.getsize(tmp) > 1000:
             to_ogg(tmp, f"voices/lab/{token}__espeak.ogg", gain_db=3)
             cands.append("espeak")
@@ -88,7 +88,7 @@ def main():
             # exact phoneme + schwa release via espeak (accurate, audible)
             tmp = f"/tmp/lab_{token}_espeakuh.wav"
             r = subprocess.run(
-                ["espeak-ng", "-v", "en-gb", "-s", "95", "-w", tmp, f"[[{ph}]]"])
+                ["espeak-ng", "-v", "en-gb+f3", "-s", "95", "-w", tmp, f"[[{ph}]]"])
             if r.returncode == 0 and os.path.getsize(tmp) > 1000:
                 to_ogg(tmp, f"voices/lab/{token}__espeak-uh.ogg", gain_db=3)
                 cands.append("espeak-uh")

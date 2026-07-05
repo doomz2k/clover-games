@@ -18,7 +18,7 @@ import wave
 
 from piper import PiperVoice, SynthesisConfig
 
-VOICE_PATH = os.environ.get("PIPER_VOICE", "en_GB-northern_english_male-medium.onnx")
+VOICE_PATH = os.environ.get("PIPER_VOICE", "en_GB-cori-high.onnx")
 FORCE = "--force" in sys.argv
 
 PROFILE_SETTINGS = {
@@ -28,7 +28,7 @@ PROFILE_SETTINGS = {
 }
 
 # alien: shift the formants/pitch up ~35% then restore duration
-ALIEN_FILTER = "asetrate=22050*1.35,aresample=22050,atempo=0.95"
+ALIEN_FILTER = "asetrate=22050*1.26,aresample=22050,atempo=0.95"
 
 
 def main():

@@ -9,17 +9,18 @@
 
 import { isMuted } from './audio.js';
 
-const PREFERRED_MALE = [
+const PREFERRED_FEMALE = [
   // "Natural" neural voices first - hugely less robotic where available
-  'Microsoft Ryan Online (Natural) - English (United Kingdom)',
-  'Microsoft Thomas Online (Natural) - English (United Kingdom)',
-  'Microsoft Alfie Online (Natural) - English (United Kingdom)',
-  'Google UK English Male',
-  'Microsoft Ryan - English (United Kingdom)',
-  'Microsoft George - English (United Kingdom)',
-  'Microsoft George',
-  'Daniel (English (United Kingdom))',
-  'Daniel',
+  'Microsoft Sonia Online (Natural) - English (United Kingdom)',
+  'Microsoft Libby Online (Natural) - English (United Kingdom)',
+  'Microsoft Maisie Online (Natural) - English (United Kingdom)',
+  'Google UK English Female',
+  'Microsoft Sonia - English (United Kingdom)',
+  'Microsoft Hazel - English (United Kingdom)',
+  'Microsoft Hazel',
+  'Kate (English (United Kingdom))',
+  'Kate',
+  'Serena',
 ];
 
 const PROFILES = {
@@ -50,10 +51,10 @@ function pickVoice() {
   if (!voices.length) return;
   const gb = voices.filter((v) => v.lang === 'en-GB');
   chosenVoice =
-    voices.find((v) => PREFERRED_MALE.includes(v.name)) ||
-    gb.find((v) => /natural/i.test(v.name) && !/female|sonia|libby|maisie|hollie|olivia|abbi|bella/i.test(v.name)) ||
-    gb.find((v) => /male|daniel|george|ryan|arthur|oliver|brian/i.test(v.name) && !/female/i.test(v.name)) ||
-    gb.find((v) => !/female|hazel|susan|libby|sonia|woman/i.test(v.name)) ||
+    voices.find((v) => PREFERRED_FEMALE.includes(v.name)) ||
+    gb.find((v) => /natural/i.test(v.name) && /sonia|libby|maisie|hollie|olivia|abbi|bella|female/i.test(v.name)) ||
+    gb.find((v) => /female|hazel|susan|sonia|libby|kate|serena|stephanie/i.test(v.name)) ||
+    gb.find((v) => !/male|daniel|george|ryan|arthur|oliver|brian|thomas|alfie/i.test(v.name)) ||
     gb[0] ||
     voices.find((v) => v.lang.startsWith('en')) ||
     voices[0];

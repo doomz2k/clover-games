@@ -35,7 +35,7 @@ jobs:
           sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
 
       - name: Download voice model
-        run: python -m piper.download_voices en_GB-northern_english_male-medium
+        run: python -m piper.download_voices en_GB-cori-high
 
       - name: Build manifest
         run: node tools/gen-voice-manifest.mjs
@@ -43,7 +43,7 @@ jobs:
       - name: Render clips
         run: python tools/render_voices.py ${{ inputs.force && '--force' || '' }}
         env:
-          PIPER_VOICE: en_GB-northern_english_male-medium.onnx
+          PIPER_VOICE: en_GB-cori-high.onnx
 
       # Isolated phonic sounds use real human phoneme recordings (Wikimedia
       # Commons) instead of TTS - always overwrites its subset of clips.
@@ -57,7 +57,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add voices
           git diff --cached --quiet && echo "no changes" && exit 0
-          git commit -m "Generate narration voice clips (Piper en_GB male)"
+          git commit -m "Generate narration voice clips (Piper en_GB female)"
           git pull --rebase origin main
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"

@@ -192,7 +192,7 @@ def main():
         f.write("# Narration audio credits\n\n"
                 "Sentence narration is synthesised with [Piper]"
                 "(https://github.com/OHF-Voice/piper1-gpl) using the "
-                "`en_GB-northern_english_male-medium` voice.\n\n"
+                "`en_GB-cori-high` voice.\n\n"
                 "The isolated phonic sounds are human phoneme recordings "
                 "from Wikimedia Commons, used under their respective free "
                 "licences:\n\n")
