@@ -16,7 +16,7 @@ import subprocess
 import sys
 import wave
 
-from piper import PiperVoice
+from piper import PiperVoice, SynthesisConfig
 
 VOICE_PATH = os.environ.get("PIPER_VOICE", "en_GB-northern_english_male-medium.onnx")
 FORCE = "--force" in sys.argv
@@ -49,8 +49,9 @@ def main():
         settings = PROFILE_SETTINGS.get(profile, PROFILE_SETTINGS["narrator"])
 
         tmp_wav = f"/tmp/{key}.wav"
+        syn_config = SynthesisConfig(length_scale=settings["length_scale"])
         with wave.open(tmp_wav, "wb") as wav_file:
-            voice.synthesize(text, wav_file, length_scale=settings["length_scale"])
+            voice.synthesize_wav(text, wav_file, syn_config=syn_config)
 
         cmd = ["ffmpeg", "-y", "-loglevel", "error", "-i", tmp_wav]
         if profile == "alien":
