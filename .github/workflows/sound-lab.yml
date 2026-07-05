@@ -1,0 +1,60 @@
+name: Build sound lab
+
+# Re-fetches the human phoneme recordings with the improved trim, builds
+# candidate renderings of every phonic sound for /sound-lab.html, applies
+# any picks in tools/sound_choices.json, commits, and deploys.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Piper, espeak-ng, ffmpeg
+        run: |
+          pip install piper-tts
+          sudo apt-get update -q && sudo apt-get install -y -q ffmpeg espeak-ng
+
+      - name: Download voice model
+        run: python -m piper.download_voices en_GB-northern_english_male-medium
+
+      - name: Re-fetch human phoneme recordings (improved trim)
+        run: python tools/fetch_phoneme_clips.py --force
+
+      - name: Build candidate renderings
+        run: python tools/build_sound_lab.py
+        env:
+          PIPER_VOICE: en_GB-northern_english_male-medium.onnx
+
+      - name: Apply operator picks
+        run: python tools/apply_sound_choices.py
+
+      - name: Commit
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add voices
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "Rebuild phonic sounds + sound lab candidates"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger site deploy
+        if: steps.commit.outputs.pushed == 'true'
+        run: gh workflow run deploy-pages.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

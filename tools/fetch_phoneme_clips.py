@@ -116,11 +116,11 @@ def first_utterance_end(wav: str) -> float | None:
     """Recordings often say the sound twice or in an a-C-a frame; keep only
     the first burst: cut at the first inter-utterance silence."""
     p = run(["ffmpeg", "-i", wav, "-af",
-             "silencedetect=noise=-35dB:d=0.22", "-f", "null", "-"])
+             "silencedetect=noise=-32dB:d=0.15", "-f", "null", "-"])
     starts = [float(m) for m in
               re.findall(r"silence_start: ([0-9.]+)", p.stderr)]
     for t in starts:
-        if t > 0.08:
+        if t > 0.05:
             return t
     return None
 
@@ -158,12 +158,18 @@ def main():
             continue
 
         wav = raw + ".wav"
+        # strip leading silence during decode so cut times are sound-relative
+        # (recordings often open with quiet, which used to break the trim)
         run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw,
-             "-ar", "22050", "-ac", "1", wav])
+             "-ar", "22050", "-ac", "1",
+             "-af", "silenceremove=start_periods=1:start_threshold=-45dB",
+             wav])
 
         cut = first_utterance_end(wav)
         gain = peak_gain(wav)
-        trim = ["-t", f"{min(cut + 0.06, 1.8):.3f}"] if cut else ["-t", "1.8"]
+        # cap hard at 1.2s: these are single isolated sounds, and the source
+        # recordings often continue into an "a-C-a" demonstration frame
+        trim = ["-t", f"{min(cut + 0.05, 1.2):.3f}"] if cut else ["-t", "1.2"]
         # areverse/fade-in/areverse fades the tail without knowing the length
         run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, *trim,
              "-af", f"volume={gain:.1f}dB,"

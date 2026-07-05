@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Lab - Clover Games</title>
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link href="fonts/fonts.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fdf6e9; color: #4a3b2a; font-family: 'Quicksand', sans-serif;
+         padding: 28px; max-width: 980px; margin: 0 auto; }
+  h1 { font-family: 'Fredoka One', sans-serif; color: #3f7f3a; }
+  p.hint { color: #8a7a63; font-weight: 500; margin: 8px 0 20px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 2px solid #eadfc8; }
+  th { font-family: 'Fredoka One', sans-serif; color: #3f7f3a; font-weight: 400; }
+  .tok { font-family: 'Fredoka One', sans-serif; font-size: 20px; }
+  button.play {
+    font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 14px;
+    background: #ffd75e; border: 2.5px solid #b8860b; border-radius: 999px;
+    padding: 6px 14px; cursor: pointer; margin-right: 4px;
+  }
+  button.play:active { transform: translateY(1px); }
+  label.pick { display: inline-flex; align-items: center; gap: 3px; margin-right: 10px;
+               font-weight: 700; font-size: 13px; }
+  #export { margin-top: 24px; }
+  #export button { font-family: 'Fredoka One', sans-serif; font-size: 17px; color: #fff;
+    background: #5aa653; border: 3px solid #3f7f3a; border-radius: 999px;
+    padding: 10px 26px; cursor: pointer; }
+  textarea { width: 100%; height: 110px; margin-top: 10px; font-family: monospace; }
+</style>
+</head>
+<body>
+  <h1>&#128266; Sound Lab</h1>
+  <p class="hint">Audition each rendering of every phonic sound, tick the best one per row,
+  then press <b>Copy my choices</b> and paste the result back to your developer.
+  <b>live</b> = what the game currently plays.</p>
+  <table id="grid"><tr><th>Sound</th><th>Listen</th><th>Pick the best</th></tr></table>
+  <div id="export">
+    <button id="copy">&#128203; Copy my choices</button>
+    <textarea id="out" placeholder="Your choices appear here - paste them back to the developer."></textarea>
+  </div>
+
+<script>
+const audio = new Audio();
+fetch('voices/lab/manifest.json')
+  .then((r) => r.json())
+  .then((manifest) => {
+    const grid = document.getElementById('grid');
+    for (const [token, cands] of Object.entries(manifest)) {
+      const tr = document.createElement('tr');
+      const plays = cands.map((c) =>
+        `<button class="play" data-src="voices/lab/${token}__${c}.ogg">&#9654; ${c}</button>`).join('');
+      const picks = cands.map((c) =>
+        `<label class="pick"><input type="radio" name="pick-${token}" value="${c}"
+          ${c === 'live' ? 'checked' : ''}>${c}</label>`).join('');
+      tr.innerHTML = `<td class="tok">${token}</td><td>${plays}</td><td>${picks}</td>`;
+      grid.appendChild(tr);
+    }
+    grid.addEventListener('click', (e) => {
+      const b = e.target.closest('button.play');
+      if (!b) return;
+      audio.src = b.dataset.src;
+      audio.play();
+    });
+    document.getElementById('copy').addEventListener('click', () => {
+      const out = {};
+      for (const token of Object.keys(manifest)) {
+        const sel = document.querySelector(`input[name="pick-${token}"]:checked`);
+        if (sel && sel.value !== 'live') out[token] = sel.value;
+      }
+      const text = JSON.stringify(out, null, 1);
+      document.getElementById('out').value = text;
+      navigator.clipboard?.writeText(text);
+    });
+  })
+  .catch(() => {
+    document.body.insertAdjacentHTML('beforeend',
+      '<p class="hint"><b>The lab clips have not been generated yet - run the sound-lab workflow first.</b></p>');
+  });
+</script>
+</body>
+</html>
