@@ -54,6 +54,9 @@ export class SceneManager {
 
     const onResize = () => this.layout();
     window.addEventListener('resize', onResize);
+    // Pixi applies its own resize after our window listener may have run -
+    // re-layout on the renderer's resize event so sizes are never stale.
+    app.renderer.on('resize', onResize);
     this.layout();
 
     app.ticker.add((ticker) => this.current?.update(ticker.deltaMS));
@@ -62,10 +65,11 @@ export class SceneManager {
   layout() {
     const sw = this.app.renderer.width / this.app.renderer.resolution;
     const sh = this.app.renderer.height / this.app.renderer.resolution;
-    const scale = Math.min(sw / W, sh / H);
-    this.root.scale.set(scale);
-    this.root.x = (sw - W * scale) / 2;
-    this.root.y = (sh - H * scale) / 2;
+    // Fill the entire window at any aspect ratio: the logical 1280x800
+    // stage stretches to match. No letterboxing, nothing cropped.
+    this.root.scale.set(sw / W, sh / H);
+    this.root.x = 0;
+    this.root.y = 0;
 
     // repaint the window-filling backdrop (water + faint bubbles)
     this.bleed.clear();

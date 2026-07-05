@@ -7,6 +7,10 @@
 import { isMuted } from './audio.js';
 
 const PREFERRED_MALE = [
+  // "Natural" neural voices first - hugely less robotic where available
+  'Microsoft Ryan Online (Natural) - English (United Kingdom)',
+  'Microsoft Thomas Online (Natural) - English (United Kingdom)',
+  'Microsoft Alfie Online (Natural) - English (United Kingdom)',
   'Google UK English Male',
   'Microsoft Ryan - English (United Kingdom)',
   'Microsoft George - English (United Kingdom)',
@@ -16,8 +20,10 @@ const PREFERRED_MALE = [
 ];
 
 const PROFILES = {
-  narrator: { pitch: 1.05, rate: 0.9 },
+  narrator: { pitch: 1.05, rate: 0.85 },
   alien: { pitch: 1.85, rate: 1.15 },
+  // for isolated phonic sounds: very slow so nothing gets mangled
+  sound: { pitch: 1.0, rate: 0.5 },
 };
 
 let chosenVoice = null;
@@ -31,6 +37,7 @@ function pickVoice() {
   const gb = voices.filter((v) => v.lang === 'en-GB');
   chosenVoice =
     voices.find((v) => PREFERRED_MALE.includes(v.name)) ||
+    gb.find((v) => /natural/i.test(v.name) && !/female|sonia|libby|maisie|hollie|olivia|abbi|bella/i.test(v.name)) ||
     gb.find((v) => /male|daniel|george|ryan|arthur|oliver|brian/i.test(v.name) && !/female/i.test(v.name)) ||
     gb.find((v) => !/female|hazel|susan|libby|sonia|woman/i.test(v.name)) ||
     gb[0] ||

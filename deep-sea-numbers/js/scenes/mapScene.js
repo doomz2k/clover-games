@@ -150,7 +150,7 @@ export class MapScene extends Scene {
       const dy = e.global.y - lastY;
       lastY = e.global.y;
       this.dragDist += Math.abs(dy);
-      this.setScroll(this.scrollY - dy / this.container.worldTransform.a);
+      this.setScroll(this.scrollY - dy / this.container.worldTransform.d);
     });
     const stop = () => { dragging = false; };
     this.container.on('pointerup', stop);

@@ -82,13 +82,27 @@ export class QuestionScene extends Scene {
   get q() { return this.questions[this.qIndex]; }
 
   speakPrompt(interrupt = false) {
-    say(this.q.prompt, { interrupt });
+    const q = this.q;
+    if (q.promptSound) {
+      // sentence first, then the sound on its own - slow and twice
+      say(q.promptPre, { interrupt });
+      const s = SOUND_SPEECH[q.promptSound] || q.promptSound;
+      say(s, { profile: 'sound' });
+      say(s, { profile: 'sound' });
+    } else {
+      say(q.prompt, { interrupt });
+    }
   }
 
   // Speak one answer choice aloud (preview chips).
   speakChoice(choice) {
-    if (choice.kind === 'sound') say(SOUND_SPEECH[choice.value] || choice.value, { interrupt: true });
-    else say(choice.value, { interrupt: true });
+    if (choice.kind === 'sound') {
+      const s = SOUND_SPEECH[choice.value] || choice.value;
+      say(s, { interrupt: true, profile: 'sound' });
+      say(s, { profile: 'sound' });
+    } else {
+      say(choice.value, { interrupt: true });
+    }
   }
 
   // ---------- rendering ----------
@@ -234,7 +248,13 @@ export class QuestionScene extends Scene {
     } else {
       // third miss: reveal and auto-select the correct card
       const correct = this.cards.find((c) => c.choice.correct);
-      say(`The answer is ${this.q.answerSpoken}!`, { interrupt: true });
+      if (this.q.answerIsSound) {
+        say('The answer is...', { interrupt: true });
+        say(this.q.answerSpoken, { profile: 'sound' });
+        say(this.q.answerSpoken, { profile: 'sound' });
+      } else {
+        say(`The answer is ${this.q.answerSpoken}!`, { interrupt: true });
+      }
       correct.setBorder(COLORS.gold, 9);
       await tween(correct.scale, { x: 1.15, y: 1.15 }, 260, { ease: Ease.outBack });
       await tween(correct.scale, { x: 1, y: 1 }, 260);

@@ -64,6 +64,11 @@ function buildSoundQuestion(qtype, g, pool, allSounds, usedWords) {
       qtype, sound: g,
       stimulus: { kind: 'sound', value: g },
       prompt,
+      // spoken as sentence + isolated slow sound so it never gets mangled
+      promptPre: pos === 'mid'
+        ? 'Which picture has this sound in it?'
+        : `Which picture ${positionPhrase(pos)} this sound?`,
+      promptSound: g,
       choices: randShuffle([
         { kind: 'picture', value: word.w, correct: true },
         ...distractors.map((d) => ({ kind: 'picture', value: d.w, correct: false })),
@@ -83,6 +88,7 @@ function buildSoundQuestion(qtype, g, pool, allSounds, usedWords) {
     qtype, sound: g,
     stimulus: { kind: 'picture', value: word.w },
     prompt,
+    answerIsSound: true,
     choices: randShuffle([
       { kind: 'sound', value: g, correct: true },
       ...soundChoices.map((sd) => ({ kind: 'sound', value: sd, correct: false })),
