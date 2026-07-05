@@ -1,6 +1,6 @@
 # Narration audio credits
 
-Sentence narration is synthesised with [Piper](https://github.com/OHF-Voice/piper1-gpl) using the `en_GB-northern_english_male-medium` voice.
+Sentence narration is synthesised with [Piper](https://github.com/OHF-Voice/piper1-gpl) using the `en_GB-cori-high` voice.
 
 The isolated phonic sounds are human phoneme recordings from Wikimedia Commons, used under their respective free licences:
 
