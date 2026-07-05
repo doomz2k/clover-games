@@ -160,5 +160,9 @@
   <script src="https://cdn.jsdelivr.net/npm/pixi.js@8/dist/pixi.min.js"
           onerror="var s=document.createElement('script');s.src='../vendor/pixi.min.js';document.head.appendChild(s);"></script>
   <script type="module" src="js/main.js"></script>
+  <script>
+    // Offline support (root service worker, scoped to the whole site)
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js');
+  </script>
 </body>
 </html>

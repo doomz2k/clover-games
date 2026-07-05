@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificate - Clover Games</title>
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link href="fonts/fonts.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fdf6e9;
+    font-family: 'Quicksand', 'Trebuchet MS', sans-serif;
+    color: #4a3b2a;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 48px;
+  }
+  .actions { margin-bottom: 20px; display: flex; gap: 12px; }
+  .actions a, .actions button {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: 17px; color: #fff;
+    background: #5aa653; border: 3px solid #3f7f3a;
+    border-radius: 999px; padding: 10px 24px;
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 4px 0 #3f7f3a;
+  }
+  .cert {
+    background: #fffdf7;
+    border: 6px solid #b8860b;
+    outline: 3px solid #ffd75e;
+    outline-offset: -14px;
+    border-radius: 18px;
+    max-width: 860px; width: 100%;
+    padding: clamp(28px, 5vw, 64px);
+    text-align: center;
+    box-shadow: 0 10px 0 rgba(74, 59, 42, 0.2);
+  }
+  .cert .clover { font-size: 54px; }
+  .cert h1 {
+    font-family: 'Fredoka One', sans-serif;
+    font-size: clamp(30px, 5vw, 46px);
+    color: #3f7f3a; margin: 6px 0 4px;
+  }
+  .cert .sub { font-weight: 700; color: #8a7a63; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; }
+  .name-line {
+    margin: 34px auto 8px; max-width: 480px;
+    border-bottom: 3px dashed #8a7a63;
+    height: 52px;
+  }
+  .name-hint { color: #8a7a63; font-size: 13px; font-weight: 500; }
+  .cert .achievement {
+    font-size: clamp(17px, 2.6vw, 22px);
+    font-weight: 700; margin: 26px 0 8px; line-height: 1.5;
+  }
+  .cert .game-name { font-family: 'Fredoka One', sans-serif; color: #b8860b; font-size: 1.25em; }
+  .sticker-row {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 6px; margin: 24px 0;
+  }
+  .sticker-row svg { width: 64px; height: 64px; }
+  .date { font-weight: 700; color: #8a7a63; margin-top: 18px; }
+  .not-yet { max-width: 620px; text-align: center; font-size: 20px; font-weight: 700; margin-top: 40px; line-height: 1.6; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .actions { display: none; }
+    .cert { box-shadow: none; max-width: none; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="actions">
+    <a href="./">&#8962; Back to hub</a>
+    <button type="button" onclick="window.print()">&#128424; Print</button>
+  </div>
+  <div id="out"></div>
+
+  <script type="module">
+    import { stickerState, stickerSVG } from './stickers.js';
+
+    const key = new URLSearchParams(location.search).get('game');
+    const game = stickerState().find((g) => g.key === key);
+    const out = document.getElementById('out');
+
+    if (!game) {
+      out.innerHTML = '<p class="not-yet">Hmm, that game does not exist. <a href="./">Back to the hub?</a></p>';
+    } else if (!game.complete) {
+      const left = game.stickers.filter((s) => !s.earned).length;
+      out.innerHTML = `<p class="not-yet">${game.emoji} Not quite yet! Earn three stars on
+        ${left} more world${left === 1 ? '' : 's'} in ${game.title} to unlock this certificate. Keep going!</p>`;
+    } else {
+      const stickers = game.stickers
+        .map((_, i) => stickerSVG(game.key, i, true)).join('');
+      const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      out.innerHTML = `<div class="cert">
+        <div class="clover">&#127808;</div>
+        <div class="sub">Clover Games &mdash; Certificate of Achievement</div>
+        <h1>Superstar!</h1>
+        <div class="name-line"></div>
+        <div class="name-hint">write your name here</div>
+        <p class="achievement">finished every world in<br>
+          <span class="game-name">${game.emoji} ${game.title}</span><br>
+          with three stars on every single one!</p>
+        <div class="sticker-row">${stickers}</div>
+        <div class="date">${date}</div>
+      </div>`;
+    }
+  </script>
+</body>
+</html>
