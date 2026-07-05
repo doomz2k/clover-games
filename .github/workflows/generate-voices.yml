@@ -45,6 +45,11 @@ jobs:
         env:
           PIPER_VOICE: en_GB-northern_english_male-medium.onnx
 
+      # Isolated phonic sounds use real human phoneme recordings (Wikimedia
+      # Commons) instead of TTS - always overwrites its subset of clips.
+      - name: Fetch phoneme recordings
+        run: python tools/fetch_phoneme_clips.py
+
       - name: Commit voices
         id: commit
         run: |

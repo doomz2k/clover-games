@@ -54,7 +54,9 @@ export class QuestionScene extends Scene {
     this.previewBtn.addChild(icon);
     this.previewBtn.x = W / 2;
     this.previewBtn.y = 208;
-    this.previewBtn.on('pointertap', () => this.speakPrompt(true));
+    // Replays just the phonic sound on sound questions (not the whole
+    // sentence again); word questions replay their prompt.
+    this.previewBtn.on('pointertap', () => this.replayStimulus());
     this.container.addChild(this.previewBtn);
 
     // Reacting alien in the corner
@@ -94,12 +96,21 @@ export class QuestionScene extends Scene {
     }
   }
 
+  replayStimulus() {
+    const q = this.q;
+    if (q.promptSound) {
+      const s = SOUND_SPEECH[q.promptSound] || q.promptSound;
+      say(s, { interrupt: true, profile: 'sound' });
+    } else {
+      say(q.prompt, { interrupt: true });
+    }
+  }
+
   // Speak one answer choice aloud (preview chips).
   speakChoice(choice) {
     if (choice.kind === 'sound') {
       const s = SOUND_SPEECH[choice.value] || choice.value;
       say(s, { interrupt: true, profile: 'sound' });
-      say(s, { profile: 'sound' });
     } else {
       say(choice.value, { interrupt: true });
     }
