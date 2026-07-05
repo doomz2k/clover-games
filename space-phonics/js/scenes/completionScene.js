@@ -25,7 +25,8 @@ function starsFor(score) {
 }
 
 export class CompletionScene extends Scene {
-  async enter({ planet, score }) {
+  async enter({ planet, score, words }) {
+    this.words = words || [];
     this.planet = planet;
     this.score = score;
     this.stars = starsFor(score);
@@ -198,6 +199,36 @@ export class CompletionScene extends Scene {
         const p = layer.toLocal(st.getGlobalPosition());
         burst(p.x, p.y, { count: 18, speed: 260, size: 0.8 });
       }
+    }
+
+    // recap strip: the words practised this round, tappable to hear again
+    if (this.words.length) {
+      const recap = this.words.slice(0, 7); // 7 chips fit the 1280 stage
+      const label = makeText('You practised:', 24, { fill: 0x8888c8 });
+      label.anchor.set(0.5);
+      label.y = 118;
+      holder.addChild(label);
+      popIn(label, 200);
+      const chipW = 132, gap = 14;
+      const rowW = recap.length * chipW + (recap.length - 1) * gap;
+      recap.forEach((word, i) => {
+        const chip = new PIXI.Container();
+        chip.addChild(
+          new PIXI.Graphics()
+            .roundRect(-chipW / 2, -26, chipW, 56, 16).fill(0x1a1a4a)
+            .roundRect(-chipW / 2, -26, chipW, 56, 16).stroke({ width: 3, color: 0xffd75e }),
+        );
+        const t = makeText(word, 30, { fill: COLORS.gold });
+        t.anchor.set(0.5);
+        chip.addChild(t);
+        chip.x = -rowW / 2 + chipW / 2 + i * (chipW + gap);
+        chip.y = 168;
+        chip.eventMode = 'static';
+        chip.cursor = 'pointer';
+        chip.on('pointertap', () => say(word, { interrupt: true }));
+        holder.addChild(chip);
+        popIn(chip, 260 + i * 90);
+      });
     }
   }
 

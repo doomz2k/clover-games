@@ -315,9 +315,14 @@ export class QuestionScene extends Scene {
   async finishRound() {
     sfxFanfare();
     await this.ship.igniteAndShake();
+    const words = [...new Set(this.questions
+      .map((q) => q.choices.find((c) => c.correct))
+      .filter((c) => c && c.kind !== 'sound')
+      .map((c) => String(c.value)))];
     this.game.scenes.switchTo(new CompletionScene(this.game), {
       planet: this.planet,
       score: this.firstTryCount,
+      words,
     });
   }
 
