@@ -50,6 +50,7 @@ jobs:
           git add voices
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "Rebuild phonic sounds + sound lab candidates"
+          git pull --rebase origin main
           git push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
 
