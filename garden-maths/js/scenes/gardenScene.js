@@ -311,8 +311,13 @@ export class GardenScene extends Scene {
     if (firstTry) sfxCorrect(); else sfxCorrectSoft();
     say(CORRECT_LINES[this.questionsAsked % CORRECT_LINES.length], { interrupt: true });
 
+    // spotlight: the answer pops, the other cards dim and shrink away
+    tween(card.scale, { x: 1.12, y: 1.12 }, 200, { ease: Ease.outBack });
     for (const other of this.choiceCards) {
-      if (other !== card) tween(other, { alpha: 0 }, 220);
+      if (other !== card) {
+        tween(other, { alpha: 0 }, 220);
+        tween(other.scale, { x: 0.88, y: 0.88 }, 220);
+      }
     }
 
     // care effect on the plant

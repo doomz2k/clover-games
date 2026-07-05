@@ -126,6 +126,11 @@ export function say(text, opts = {}) {
   });
 }
 
+/** True while a narration clip or utterance is actually playing. */
+export function isSpeaking() {
+  return speaking;
+}
+
 export function stopSpeech() {
   queue.forEach((q) => q.resolve());
   queue = [];

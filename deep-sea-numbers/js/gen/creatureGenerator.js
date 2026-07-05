@@ -7,6 +7,7 @@
 
 import { mulberry32, pick } from '../core/util.js';
 import { tween, Ease } from '../core/tween.js';
+import { isSpeaking } from '../core/speech.js';
 
 function hsl(h, s, l) {
   h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
@@ -141,6 +142,14 @@ export function makeCreature(seed, size = 120) {
   const mouthY = (M.cy + M.ry * 0.28) * s;
   const mouthX = -M.rx * 0.2 * s;
   const mw = M.rx * 0.4 * s;
+  // Open talking mouth; open01 in [0,1] drives how wide (narration flap).
+  function drawTalk(open01) {
+    mouth.clear();
+    mouth.ellipse(mouthX, mouthY + 4 * s, mw * (0.5 + open01 * 0.2), (3 + open01 * 8) * s)
+      .fill(0x7c2d3e)
+      .stroke({ width: 4 * s, color: OUTLINE });
+  }
+
   function drawMouth(mood) {
     mouth.clear();
     if (mood === 'sad') {
@@ -207,10 +216,20 @@ export function makeCreature(seed, size = 120) {
     busy = false;
   };
 
+  let talking = false;
+
   root.tick = (dtMS) => {
     const dt = dtMS / 1000;
     t += dt;
     if (!busy) bodyWrap.y = Math.sin(t * 1.8) * 4 * s;
+    const shouldTalk = isSpeaking() && (mood === 'idle' || mood === 'happy');
+    if (shouldTalk) {
+      talking = true;
+      drawTalk(0.5 + Math.sin(t * 13) * 0.5);
+    } else if (talking) {
+      talking = false;
+      drawMouth(mood);
+    }
     tail.rotation = Math.sin(t * 5) * (0.18 + wiggleBoost * 0.3);
     blinkTimer -= dt;
     if (blinkTimer <= 0) {

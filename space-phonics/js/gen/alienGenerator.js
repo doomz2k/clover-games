@@ -6,6 +6,7 @@
 
 import { mulberry32, pick } from '../core/util.js';
 import { tween, Ease } from '../core/tween.js';
+import { isSpeaking } from '../core/speech.js';
 
 function hsl(h, s, l) {
   h = ((h % 360) + 360) % 360; s /= 100; l /= 100;
@@ -122,6 +123,14 @@ export function makeAlien(seed, size = 120) {
   const mouth = new PIXI.Graphics();
   const mouthY = (M.cy + M.ry * 0.22) * s;
   const mw = M.rx * 0.5 * s;
+  // Open talking mouth; open01 in [0,1] drives how wide (narration flap).
+  function drawTalk(open01) {
+    mouth.clear();
+    mouth.ellipse(0, mouthY + 4 * s, mw * (0.42 + open01 * 0.2), (3 + open01 * 9) * s)
+      .fill(0x7c2d3e)
+      .stroke({ width: 4 * s, color: OUTLINE });
+  }
+
   function drawMouth(mood) {
     mouth.clear();
     if (mood === 'sad') {
@@ -195,11 +204,22 @@ export function makeAlien(seed, size = 120) {
     busy = false;
   };
 
+  let talking = false;
+
   root.tick = (dtMS) => {
     const dt = dtMS / 1000;
     t += dt;
     // gentle bob
     if (!busy) bodyWrap.y = Math.sin(t * 2.2) * 3 * s;
+    // flap the mouth while the narrator speaks (unless emoting)
+    const shouldTalk = isSpeaking() && (mood === 'idle' || mood === 'happy');
+    if (shouldTalk) {
+      talking = true;
+      drawTalk(0.5 + Math.sin(t * 13) * 0.5);
+    } else if (talking) {
+      talking = false;
+      drawMouth(mood);
+    }
     // blink
     blinkTimer -= dt;
     if (blinkTimer <= 0) {

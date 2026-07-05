@@ -1,0 +1,44 @@
+name: Fetch sound effects
+
+# Downloads the curated CC0 sound effects (Kenney.nl) into assets/sfx and
+# commits them. Run manually whenever tools/fetch_sfx.py's pack list
+# changes. The games synthesise fallbacks for anything missing, so this
+# can never break the site.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+
+      - name: Fetch sound effects
+        run: python3 tools/fetch_sfx.py
+
+      - name: Commit sounds
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "Fetch CC0 sound effects (Kenney.nl)"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # GITHUB_TOKEN pushes don't trigger on:push - kick the deploy directly.
+      - name: Trigger site deploy
+        if: steps.commit.outputs.pushed == 'true'
+        run: gh workflow run deploy-pages.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

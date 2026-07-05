@@ -214,9 +214,13 @@ export class QuestionScene extends Scene {
       say('Well done - keep going!', { interrupt: true, profile: 'alien' });
     }
 
-    // fade the other cards, crate flies to the next bay
+    // spotlight: the answer pops, the other cards dim and shrink away
+    tween(card.scale, { x: 1.12, y: 1.12 }, 200, { ease: Ease.outBack });
     for (const other of this.cards) {
-      if (other !== card) tween(other, { alpha: 0 }, 250);
+      if (other !== card) {
+        tween(other, { alpha: 0 }, 250);
+        tween(other.scale, { x: 0.88, y: 0.88 }, 250);
+      }
     }
     await this.ship.loadCrate(this.ship.crateCount(), globalPos, layer);
     await tween(card, { alpha: 0 }, 200);
