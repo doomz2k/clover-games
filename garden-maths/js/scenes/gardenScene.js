@@ -67,6 +67,24 @@ export class GardenScene extends Scene {
     // --- backdrop ---
     this.garden = makeGarden(W, H, { seasonShift: season.skyShift });
     this.container.addChild(this.garden.container);
+
+    // Season-opening cutscene: petals drift down across the garden
+    (async () => {
+      const petalCol = [0xf7a1c4, 0xffd75e, 0xf28f6b, 0xc9a6f2][(this.season?.id || 1) % 4];
+      for (let k = 0; k < 18; k++) {
+        const petal = new PIXI.Graphics()
+          .ellipse(0, 0, 9, 5).fill({ color: petalCol, alpha: 0.9 });
+        petal.x = Math.random() * W;
+        petal.y = -20;
+        petal.rotation = Math.random() * Math.PI;
+        this.container.addChild(petal);
+        const drift = (Math.random() - 0.5) * 200;
+        tween(petal, { y: H + 30, x: petal.x + drift, rotation: petal.rotation + 5 },
+          2600 + Math.random() * 1800, { ease: Ease.inQuad })
+          .then(() => petal.destroy());
+        await wait(90);
+      }
+    })().catch(() => {});
     const soilY = this.garden.soilY;
 
     // --- plants + state ---

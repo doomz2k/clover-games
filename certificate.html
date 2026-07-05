@@ -25,7 +25,14 @@
     box-shadow: 0 4px 0 #3f7f3a;
   }
   .cert {
-    background: #fffdf7;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 12% 22%, rgba(247,161,196,0.18) 0 26px, transparent 27px),
+      radial-gradient(circle at 88% 30%, rgba(90,166,83,0.15) 0 22px, transparent 23px),
+      radial-gradient(circle at 22% 80%, rgba(247,201,72,0.2) 0 24px, transparent 25px),
+      radial-gradient(circle at 80% 84%, rgba(76,201,240,0.16) 0 20px, transparent 21px),
+      #fffdf7;
     border: 6px solid #b8860b;
     outline: 3px solid #ffd75e;
     outline-offset: -14px;
@@ -59,6 +66,18 @@
   }
   .sticker-row svg { width: 64px; height: 64px; }
   .date { font-weight: 700; color: #8a7a63; margin-top: 18px; }
+  .bunting { display: flex; justify-content: center; gap: 4px; margin: -10px 0 12px; }
+  .bunting span {
+    width: 0; height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 24px solid var(--c, #f7a1c4);
+    transform: rotate(var(--r, 0deg));
+  }
+  .party { display: flex; justify-content: center; gap: 10px; margin-top: 6px; }
+  .party svg { width: 88px; height: 88px; }
+  .party .l { transform: rotate(-10deg); }
+  .party .r { transform: rotate(10deg); }
   .not-yet { max-width: 620px; text-align: center; font-size: 20px; font-weight: 700; margin-top: 40px; line-height: 1.6; }
   @media print {
     body { background: #fff; padding: 0; }
@@ -91,8 +110,17 @@
       const stickers = game.stickers
         .map((_, i) => stickerSVG(game.key, i, true)).join('');
       const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+      const buntCols = ['#f7a1c4', '#f7c948', '#5aa653', '#4cc9f0', '#f28f6b'];
+      const bunting = Array.from({ length: 11 }, (_, i) =>
+        `<span style="--c:${buntCols[i % buntCols.length]};--r:${(i % 2 ? 3 : -3)}deg"></span>`).join('');
+      const party = `<div class="party">
+        <span class="l">${stickerSVG(game.key, 0, true)}</span>
+        <span class="r">${stickerSVG(game.key, game.stickers.length - 1, true)}</span>
+      </div>`;
       out.innerHTML = `<div class="cert">
+        <div class="bunting">${bunting}</div>
         <div class="clover">&#127808;</div>
+        ${party}
         <div class="sub">Clover Games &mdash; Certificate of Achievement</div>
         <h1>Superstar!</h1>
         <div class="name-line"></div>

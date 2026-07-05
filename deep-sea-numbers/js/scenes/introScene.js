@@ -10,6 +10,7 @@ import { makePearlRack } from '../core/pearlRack.js';
 import { textureFor } from '../core/assets.js';
 import { LEVELS } from '../data/levels.js';
 import { tween, Ease, wait } from '../core/tween.js';
+import { burst } from '../core/particles.js';
 import { say, stopSpeech } from '../core/speech.js';
 import { QuestionScene } from './questionScene.js';
 
@@ -32,6 +33,19 @@ export class IntroScene extends Scene {
     name.y = 78;
     this.container.addChild(name);
     popIn(name, 100);
+
+    // Arrival cutscene: a splash-down curtain of bubbles rushes up as
+    // the dive begins (fire-and-forget, purely decorative)
+    (async () => {
+      const layer = this.game.scenes.particleLayer;
+      for (let i = 0; i < 6; i++) {
+        burst(120 + Math.random() * (W - 240), H - 40, {
+          count: 12, speed: 340, size: 0.7,
+          colors: [0x4cc9f0, 0xbfe8f9, 0xffffff],
+        });
+        await wait(160);
+      }
+    })().catch(() => {});
 
     // Creature swims in from the side
     this.creature = makeCreature(level.seed * 3 + 7, 180);

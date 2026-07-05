@@ -8,6 +8,9 @@ import { makePlanet } from '../gen/planetGenerator.js';
 import { makeAlien } from '../gen/alienGenerator.js';
 import { makeCargoShip } from '../core/cargoShip.js';
 import { tween, Ease, wait } from '../core/tween.js';
+import { textureFor } from '../core/assets.js';
+import { burst } from '../core/particles.js';
+import { sfxWhoosh, sfxClunk } from '../core/audio.js';
 import { say, stopSpeech } from '../core/speech.js';
 import { QuestionScene } from './questionScene.js';
 
@@ -44,6 +47,36 @@ export class IntroScene extends Scene {
     this.ship.y = -140;
     this.container.addChild(this.ship);
     tween(this.ship, { y: H - 420 }, 1100, { ease: Ease.outCubic, delay: 500 });
+
+    // Arrival cutscene: the child's rocket swoops in and touches down
+    // on the planet rim (fire-and-forget; never blocks the Go button)
+    this.rocket = new PIXI.Container();
+    const flame = new PIXI.Sprite(textureFor('ship_flame'));
+    flame.anchor.set(1, 0.5);
+    flame.rotation = -Math.PI / 2;
+    flame.width = 100;
+    flame.height = 50;
+    flame.y = 52;
+    const body = new PIXI.Sprite(textureFor('ship_body'));
+    body.anchor.set(0.5);
+    body.rotation = -Math.PI / 2;
+    body.width = body.height = 118;
+    this.rocket.addChild(flame, body);
+    this.rocket.x = -160;
+    this.rocket.y = 120;
+    this.rocket.rotation = 0.5;
+    this.container.addChild(this.rocket);
+    (async () => {
+      sfxWhoosh();
+      tween(this.rocket, { rotation: 0 }, 1300, { ease: Ease.outQuad });
+      tween(this.rocket, { x: W / 2 - 470 }, 1400, { ease: Ease.outCubic });
+      await tween(this.rocket, { y: H - 335 }, 1400, { ease: Ease.outQuad });
+      flame.visible = false;
+      sfxClunk();
+      const layer = this.game.scenes.particleLayer;
+      const lp = layer.toLocal(this.rocket.getGlobalPosition());
+      burst(lp.x, lp.y + 50, { count: 14, speed: 160, size: 0.7 });
+    })().catch(() => {});
 
     // greet once the fade has lifted and the alien has landed
     wait(1000).then(() => {
