@@ -95,6 +95,30 @@
   .cover .float { position: absolute; animation: bob 3s ease-in-out infinite; }
   @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
 
+  /* living dioramas: each cover's hero actually moves through its world */
+  .cover.space .big { animation: fly-across 13s ease-in-out infinite; }
+  @keyframes fly-across {
+    0%, 100% { transform: translate(-190%, -30%) rotate(38deg); }
+    50%      { transform: translate(90%, -75%) rotate(42deg); }
+  }
+  .cover.sea .big { animation: swim-across 16s ease-in-out infinite alternate; }
+  @keyframes swim-across {
+    0%   { transform: translate(-160%, -52%); }
+    48%  { transform: translate(60%, -35%); }
+    52%  { transform: translate(60%, -35%) scaleX(-1); }
+    100% { transform: translate(-160%, -52%) scaleX(-1); }
+  }
+  .cover.garden .big { animation: tumble 7s ease-in-out infinite; }
+  @keyframes tumble {
+    0%, 100% { transform: translate(-50%, -52%) rotate(0deg); }
+    25% { transform: translate(-30%, -70%) rotate(95deg); }
+    50% { transform: translate(-50%, -52%) rotate(185deg); }
+    75% { transform: translate(-70%, -70%) rotate(275deg); }
+  }
+  /* soft evening tint after 7pm / before 7am (set by script) */
+  body.evening .cover { filter: brightness(0.82) saturate(0.92); }
+  body.evening { background: linear-gradient(180deg, #efe3d0 0%, #fdf6e9 40%); }
+
   /* Space Phonics cover: night sky */
   .cover.space { background: linear-gradient(180deg, #0a0a2e 0%, #232364 100%); }
   .cover.space .star {
@@ -333,6 +357,10 @@
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
   </script>
   <script>
+    // Evening tint: the shelf dims softly outside 7am-7pm local time.
+    const hour = new Date().getHours();
+    if (hour < 7 || hour >= 19) document.body.classList.add('evening');
+
     // Show each game's earned stars on its card (read from that game's save).
     for (const el of document.querySelectorAll('.progress')) {
       try {
