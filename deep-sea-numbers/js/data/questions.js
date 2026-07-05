@@ -97,7 +97,7 @@ const BUILDERS = {
     return {
       kind: 'add',
       stimulus: { kind: 'sum', a, b, op: '+', species: sp.key },
-      prompt: `${NUMBER_WORDS[a]} ${sp.plural}, add ${NUMBER_WORDS[b]} more. How many altogether?`,
+      prompt: `${NUMBER_WORDS[a]} ${a === 1 ? sp.word : sp.plural}, add ${NUMBER_WORDS[b]} more. How many altogether?`,
       choices: numeralChoices(total, Math.max(0, total - 3), Math.min(10, total + 3)),
       answerSpoken: NUMBER_WORDS[total],
     };
