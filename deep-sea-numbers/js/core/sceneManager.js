@@ -49,7 +49,21 @@ export class SceneManager {
       });
     }
 
-    this.root.addChild(this.sceneLayer, this.particleLayer, this.overlay);
+    // cinematic vignette: grades every scene, sits under the transitions
+    this.vignette = new PIXI.Graphics();
+    this.vignette.eventMode = 'none';
+    const vGrad = new PIXI.FillGradient({
+      type: 'radial',
+      colorStops: [
+        { offset: 0, color: 'rgba(2,16,31,0)' },
+        { offset: 0.62, color: 'rgba(2,16,31,0)' },
+        { offset: 1, color: 'rgba(2,16,31,0.32)' },
+      ],
+      textureSpace: 'local',
+    });
+    this.vignette.rect(0, 0, W, H).fill(vGrad);
+
+    this.root.addChild(this.sceneLayer, this.particleLayer, this.vignette, this.overlay);
     app.stage.addChild(this.root);
 
     const onResize = () => this.layout();

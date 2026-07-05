@@ -15,6 +15,7 @@ import { SEASONS, FAMILIES, FULL_BLOOM, CARE_OF_OP, MAX_ROUNDS, PEST_CAP } from 
 import { rollQuestion, rollDivQuestion, makeChoices, OP_SYMBOL } from '../data/questions.js';
 import { tween, Ease, wait } from '../core/tween.js';
 import { say, stopSpeech } from '../core/speech.js';
+import { setMusicIntensity } from '../core/music.js';
 import { burst } from '../core/particles.js';
 import {
   sfxCorrect, sfxCorrectSoft, sfxBoing, sfxRattle, sfxGrow, sfxFanfare,
@@ -313,6 +314,7 @@ export class GardenScene extends Scene {
     this.streak = firstTry ? (this.streak || 0) + 1 : 0;
     burst(gp.x, gp.y, { count: firstTry ? Math.min(40 + this.streak * 10, 90) : 20 });
     if (this.streak >= 3) burst(gp.x, gp.y, { count: 18, speed: 420 });
+    setMusicIntensity(Math.min(1, 0.35 + this.streak * 0.13));
     if (firstTry) sfxCorrect(); else sfxCorrectSoft();
     say(CORRECT_LINES[this.questionsAsked % CORRECT_LINES.length], { interrupt: true });
 
@@ -367,6 +369,7 @@ export class GardenScene extends Scene {
 
   async onWrong(card) {
     this.phase = 'feedback';
+    setMusicIntensity(0.35);
     this.streak = 0;
     this.wrongCount++;
     sfxBoing();

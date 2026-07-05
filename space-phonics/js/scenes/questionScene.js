@@ -12,9 +12,15 @@ import { buildQuestions } from '../data/questions.js';
 import { SOUND_SPEECH } from '../data/words.js';
 import { tween, Ease, wait } from '../core/tween.js';
 import { say, stopSpeech } from '../core/speech.js';
+import { setMusicIntensity } from '../core/music.js';
 import { burst } from '../core/particles.js';
 import { sfxCorrect, sfxCorrectSoft, sfxBoing, sfxFanfare, sfxTap } from '../core/audio.js';
 import { CompletionScene } from './completionScene.js';
+
+const CHEERS = [
+  "Brilliant! That's right!",
+  'Wow!', 'Yay!', 'Amazing!', 'Super!', 'Hooray!', 'Wheee!',
+];
 
 const CARD_W = 272;
 const CARD_H = 226;
@@ -213,12 +219,15 @@ export class QuestionScene extends Scene {
       : { count: 22, speed: 300 });
     if (this.streak >= 3) burst(local.x, local.y, { count: 22, speed: 430 });
     if (this.streak === 5) this.alien.celebrate().catch(() => {});
+    setMusicIntensity(Math.min(1, 0.35 + this.streak * 0.13));
 
     this.alien.setMood('happy');
     this.alien.jump();
     if (firstTry) {
       sfxCorrect();
-      say("Brilliant! That's right!", { interrupt: true, profile: 'alien' });
+      // varied reactions: the standard cheer first, then random barks
+      const cheer = this.streak <= 1 ? CHEERS[0] : CHEERS[1 + Math.floor(Math.random() * (CHEERS.length - 1))];
+      say(cheer, { interrupt: true, profile: 'alien' });
     } else {
       sfxCorrectSoft();
       say('Well done - keep going!', { interrupt: true, profile: 'alien' });
@@ -249,6 +258,7 @@ export class QuestionScene extends Scene {
     this.busy = true;
     this.mistakes++;
     this.wrongCount++;
+    setMusicIntensity(0.35);
     this.streak = 0;
     sfxBoing();
     this.alien.wobble();

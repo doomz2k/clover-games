@@ -41,6 +41,13 @@ export const SONG = {
   },
 };
 
+// 0..1 momentum: scenes raise it on answer streaks. Higher = denser
+// melody, brighter filter, and a soft percussion pulse fading in.
+let intensity = 0.35;
+export function setMusicIntensity(v) {
+  intensity = Math.max(0, Math.min(1, v));
+}
+
 let started = false;
 
 /** Start the soundtrack. Call after the AudioContext is unlocked. */
@@ -96,8 +103,21 @@ export function startMusic(song = SONG) {
     o.stop(t + song.pluckDecay + 0.05);
   }
 
+  function hat(t, level) {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'triangle';
+    o.frequency.value = 5200 + Math.random() * 900;
+    g.gain.setValueAtTime(level, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+    o.connect(g).connect(lp);
+    o.start(t);
+    o.stop(t + 0.08);
+  }
+
   function tick() {
     if (ctx.state !== 'running') return; // resumes seamlessly when unlocked
+    lp.frequency.setTargetAtTime(song.filter * (0.8 + intensity * 0.8), ctx.currentTime, 0.6);
     const horizon = ctx.currentTime + 0.7;
     while (nextBeat < horizon) {
       const t = nextBeat;
@@ -105,7 +125,10 @@ export function startMusic(song = SONG) {
         const chord = song.chords[(beatIndex / song.beatsPerChord) % song.chords.length];
         padChord(chord, t, song.beatsPerChord * beat + 0.5);
       }
-      if (Math.random() < song.pluckChance) {
+      if (intensity > 0.45 && beatIndex % 2 === 1) {
+        hat(t, (intensity - 0.45) * 0.02);
+      }
+      if (Math.random() < song.pluckChance * (0.6 + intensity * 1.1)) {
         const steps = [-2, -1, -1, 1, 1, 2];
         melodyIdx = Math.max(0, Math.min(song.scale.length - 1,
           melodyIdx + steps[Math.floor(Math.random() * steps.length)]));

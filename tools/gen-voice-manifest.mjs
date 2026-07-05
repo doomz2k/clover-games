@@ -32,6 +32,8 @@ function add(text, profile = 'narrator') {
 // Shared reaction lines (identical strings across games dedupe by hash)
 // ---------------------------------------------------------------------------
 add("Brilliant! That's right!", 'alien');
+// streak barks (space + sea question scenes pick one at random)
+for (const b of ['Wow!', 'Yay!', 'Amazing!', 'Super!', 'Hooray!', 'Wheee!']) add(b, 'alien');
 add('Well done - keep going!', 'alien');
 add('Ooh, not quite - have another go!', 'alien');
 add('Let me give you a clue...', 'alien');

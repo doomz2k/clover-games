@@ -12,6 +12,7 @@ import { buildQuestions } from '../data/questions.js';
 import { LEVELS, SPECIES, NUMBER_WORDS } from '../data/levels.js';
 import { tween, Ease, wait } from '../core/tween.js';
 import { say, stopSpeech } from '../core/speech.js';
+import { setMusicIntensity } from '../core/music.js';
 import { burst } from '../core/particles.js';
 import { sfxCorrect, sfxCorrectSoft, sfxBoing, sfxFanfare, sfxTap } from '../core/audio.js';
 import { CompletionScene } from './completionScene.js';
@@ -22,6 +23,11 @@ const CHOICE_X = [320, 640, 960];
 const CHOICE_Y = 632;
 
 const BUBBLE_COLORS = [0x4cc9f0, 0xbfe8f9, 0xffffff, 0xffd75e, 0xf7a1c4];
+
+const CHEERS = [
+  "Brilliant! That's right!",
+  'Wow!', 'Yay!', 'Amazing!', 'Super!', 'Hooray!', 'Wheee!',
+];
 
 export class QuestionScene extends Scene {
   async enter({ level }) {
@@ -216,12 +222,14 @@ export class QuestionScene extends Scene {
       : { count: 22, speed: 300, colors: BUBBLE_COLORS });
     if (this.streak >= 3) burst(local.x, local.y, { count: 22, speed: 430, colors: BUBBLE_COLORS });
     if (this.streak === 5) this.creature.celebrate().catch(() => {});
+    setMusicIntensity(Math.min(1, 0.35 + this.streak * 0.13));
 
     this.creature.setMood('happy');
     this.creature.jump();
     if (firstTry) {
       sfxCorrect();
-      say("Brilliant! That's right!", { interrupt: true, profile: 'alien' });
+      const cheer = this.streak <= 1 ? CHEERS[0] : CHEERS[1 + Math.floor(Math.random() * (CHEERS.length - 1))];
+      say(cheer, { interrupt: true, profile: 'alien' });
     } else {
       sfxCorrectSoft();
       say('Well done - keep going!', { interrupt: true, profile: 'alien' });
@@ -250,6 +258,7 @@ export class QuestionScene extends Scene {
 
   async onWrong(card) {
     this.busy = true;
+    setMusicIntensity(0.35);
     this.streak = 0;
     this.wrongCount++;
     sfxBoing();
