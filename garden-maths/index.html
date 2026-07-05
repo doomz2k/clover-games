@@ -73,7 +73,10 @@
     font-family: 'Fredoka One', sans-serif;
     transition: opacity 0.5s;
   }
-  #loading.done { opacity: 0; pointer-events: none; }
+  #loading.done { opacity: 0; pointer-events: none; transition: opacity 0.45s 0.15s; }
+  /* payoff beat: the flower bursts to full bloom as loading completes */
+  #loading.done #load-flower { animation: bloom 0.55s cubic-bezier(0.2, 1.6, 0.4, 1) forwards; }
+  @keyframes bloom { 100% { transform: scale(1.9) rotate(8deg); } }
   #loading h1 {
     color: #2e5d2a; font-size: clamp(28px, 6vw, 52px);
     text-shadow: 0 2px 0 rgba(255,255,255,0.6);

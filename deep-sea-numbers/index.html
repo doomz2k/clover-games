@@ -75,7 +75,10 @@
     font-family: 'Fredoka One', sans-serif;
     transition: opacity 0.5s;
   }
-  #loading.done { opacity: 0; pointer-events: none; }
+  #loading.done { opacity: 0; pointer-events: none; transition: opacity 0.45s 0.15s; }
+  /* payoff beat: the fish dives as loading completes */
+  #loading.done #load-sub { animation: dive 0.6s cubic-bezier(0.5, 0, 1, 1) forwards; }
+  @keyframes dive { 25% { transform: translateY(-10px) rotate(0deg); } 100% { transform: translateY(120vh) rotate(18deg); } }
   #loading h1 {
     color: #ffd75e; font-size: clamp(28px, 6vw, 52px);
     text-shadow: 0 0 24px rgba(255, 215, 94, 0.5);
