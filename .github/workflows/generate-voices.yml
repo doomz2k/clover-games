@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   render:
@@ -45,6 +46,7 @@ jobs:
           PIPER_VOICE: en_GB-northern_english_male-medium.onnx
 
       - name: Commit voices
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -52,3 +54,12 @@ jobs:
           git diff --cached --quiet && echo "no changes" && exit 0
           git commit -m "Generate narration voice clips (Piper en_GB male)"
           git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # Pushes made with GITHUB_TOKEN don't trigger the on:push deploy
+      # (GitHub's recursion guard), so kick the Pages deploy explicitly.
+      - name: Trigger site deploy
+        if: steps.commit.outputs.pushed == 'true'
+        run: gh workflow run deploy-pages.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
