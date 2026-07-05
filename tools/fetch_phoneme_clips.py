@@ -13,10 +13,13 @@ Run by generate-voices.yml after render_voices.py. Requires ffmpeg.
 Also writes voices/CREDITS.md attributing every recording.
 """
 
+import json
 import os
 import re
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -61,7 +64,17 @@ TOKEN_SOURCES = {
     #   ay eye oh ow (diphthongs), ink kwuh (blends)
 }
 
-UA = {"User-Agent": "clover-games-voice-fetch/1.0 (educational project)"}
+UA = {"User-Agent": "clover-games-voice-fetch/1.0 "
+                    "(https://github.com/doomz2k/clover-games; educational)"}
+
+# Commons rate-limits burst downloads hard; be a polite client.
+DELAY_BETWEEN_FILES = 5
+RETRIES = 4
+
+# Records which tokens already hold a Commons recording so re-runs don't
+# re-download (the clips themselves are committed alongside this file).
+MARKER = "voices/phoneme_clips.json"
+FORCE = "--force" in sys.argv
 
 
 def fnv(s: str) -> str:
@@ -75,14 +88,24 @@ def fnv(s: str) -> str:
 def download(name: str, dest: str) -> bool:
     url = ("https://commons.wikimedia.org/wiki/Special:FilePath/"
            + urllib.parse.quote(name))
-    try:
-        req = urllib.request.Request(url, headers=UA)
-        with urllib.request.urlopen(req, timeout=30) as r, open(dest, "wb") as f:
-            f.write(r.read())
-        return os.path.getsize(dest) > 1000
-    except Exception as e:
-        print(f"    {name}: {e}")
-        return False
+    for attempt in range(RETRIES):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=30) as r, \
+                    open(dest, "wb") as f:
+                f.write(r.read())
+            return os.path.getsize(dest) > 1000
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                print(f"    {name}: 404 (does not exist)")
+                return False
+            wait = int(e.headers.get("Retry-After") or 0) or 20 * (2 ** attempt)
+            print(f"    {name}: HTTP {e.code}, retrying in {wait}s")
+            time.sleep(wait)
+        except Exception as e:
+            print(f"    {name}: {e}")
+            time.sleep(10)
+    return False
 
 
 def run(cmd):
@@ -110,16 +133,25 @@ def peak_gain(wav: str) -> float:
 
 def main():
     os.makedirs("voices", exist_ok=True)
+    done = {}
+    if os.path.exists(MARKER) and not FORCE:
+        with open(MARKER) as f:
+            done = json.load(f)
     credits, failed = [], []
 
     for token, candidates in TOKEN_SOURCES.items():
         out = f"voices/{fnv(f'sound|{token}')}.ogg"
+        if token in done and os.path.exists(out):
+            print(f"  {token}: already fetched ({done[token]})")
+            credits.append((token, done[token]))
+            continue
         src = None
         raw = f"/tmp/phon_raw_{fnv(token)}"
         for name in candidates:
             if download(name, raw):
                 src = name
                 break
+            time.sleep(DELAY_BETWEEN_FILES)
         if not src:
             failed.append(token)
             print(f"  {token}: ALL SOURCES FAILED - keeping synthesised clip")
@@ -142,8 +174,13 @@ def main():
         dur = cut and f"{cut:.2f}s" or "full"
         print(f"  {token}: {src} (cut {dur}, gain {gain:+.1f}dB) -> {out}")
         credits.append((token, src))
+        done[token] = src
         os.remove(raw)
         os.remove(wav)
+        time.sleep(DELAY_BETWEEN_FILES)
+
+    with open(MARKER, "w") as f:
+        json.dump(done, f, indent=1, sort_keys=True)
 
     with open("voices/CREDITS.md", "w") as f:
         f.write("# Narration audio credits\n\n"
@@ -160,8 +197,10 @@ def main():
 
     print(f"done: {len(credits)} phoneme clips replaced, {len(failed)} failed")
     if failed:
-        print("failed tokens:", ", ".join(failed))
-        sys.exit(1)
+        # exit 0 anyway: successes must still be committed, and the marker
+        # file means the next run retries only what's missing
+        print("FAILED TOKENS (kept synthesised, re-run to retry):",
+              ", ".join(failed))
 
 
 if __name__ == "__main__":
