@@ -52,6 +52,8 @@ export function makeButton(label, { width = 280, height = 84, fill = COLORS.gold
   const up = () => { face.y = 0; txt.y = 0; };
   c.on('pointerup', up);
   c.on('pointerupoutside', up);
+  c.on('pointerover', () => tween(c.scale, { x: 1.06, y: 1.06 }, 120));
+  c.on('pointerout', () => tween(c.scale, { x: 1, y: 1 }, 120));
   c.on('pointertap', () => sfxTap());
   return c;
 }
@@ -74,6 +76,18 @@ export function makeCard(width, height, { fill = COLORS.cardFill, border = COLOR
       .roundRect(-width / 2, -height / 2, width, height, 26).stroke({ width: w, color });
   };
   return c;
+}
+
+
+/** Gentle infinite breathing pulse for primary call-to-action buttons. */
+export function pulseForever(obj, amount = 1.05, period = 950) {
+  const grow = () => {
+    if (obj.destroyed) return;
+    tween(obj.scale, { x: amount, y: amount }, period / 2, { ease: Ease.inOutQuad })
+      .then(() => tween(obj.scale, { x: 1, y: 1 }, period / 2, { ease: Ease.inOutQuad }))
+      .then(grow);
+  };
+  grow();
 }
 
 export function popIn(obj, delay = 0, duration = 350) {

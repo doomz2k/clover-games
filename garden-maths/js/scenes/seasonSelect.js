@@ -71,6 +71,8 @@ export class SeasonSelectScene extends Scene {
 
       tile.eventMode = 'static';
       tile.cursor = saved.unlocked ? 'pointer' : 'default';
+      tile.on('pointerover', () => { if (isUnlocked(season.id)) tween(tile.scale, { x: 1.04, y: 1.04 }, 120); });
+      tile.on('pointerout', () => { if (!this.zooming) tween(tile.scale, { x: 1, y: 1 }, 120); });
       tile.on('pointertap', () => {
         if (this.zooming) return;
         if (isUnlocked(season.id)) this.startSeason(season, tile);

@@ -6,7 +6,7 @@
 // of the round. All three plants at full bloom completes the season.
 
 import { Scene, W, H } from '../core/sceneManager.js';
-import { makeGarden, makeText, makeCard, makeButton, popIn, COLORS, FONT } from '../core/ui.js';
+import { makeGarden, makeText, makeCard, makeButton, popIn, pulseForever, COLORS, FONT } from '../core/ui.js';
 import { makePlant } from '../gen/plantGenerator.js';
 import { makeDie } from '../gen/diceGenerator.js';
 import { makePest, makeLadybird } from '../gen/bugGenerator.js';
@@ -135,6 +135,7 @@ export class GardenScene extends Scene {
     this.rollBtn.x = 190;
     this.rollBtn.y = this.uiCenterY;
     this.rollBtn.on('pointertap', () => this.onRoll());
+    pulseForever(this.rollBtn, 1.04);
     this.container.addChild(this.rollBtn);
 
     this.sumText = makeText('', 66, { fill: 0xffffff, stroke: 0x2e3d1a, strokeWidth: 7 });

@@ -38,12 +38,14 @@ export const PICTURES_1 = {
     <path d="M36 44 q-4 8 -2 16" fill="none" stroke="#ffffff" stroke-opacity="0.6"/>`,
 
   tap: `
-    <rect x="42" y="18" width="16" height="12" rx="4" fill="#b8c0d0"/>
-    <rect x="30" y="20" width="8" height="8" rx="3" fill="#b8c0d0"/>
-    <rect x="62" y="20" width="8" height="8" rx="3" fill="#b8c0d0"/>
-    <path d="M44 30 h12 v10 c14 0 22 8 22 20 h-14 c0 -6 -3 -8 -8 -8 h-12 z" fill="#b8c0d0"/>
-    <path d="M62 68 q-5 8 0 13 q6 -5 0 -13 z" fill="#4cc9f0"/>
-    <path d="M62 86 q-3 5 0 8 q4 -3 0 -8 z" fill="#4cc9f0" stroke-width="3.5"/>`,
+    <circle cx="44" cy="14" r="6" fill="#8b9bb8"/>
+    <path d="M32 14 h24 M44 14 v-8 M44 14 v8" fill="none" stroke-width="5"/>
+    <rect x="38" y="22" width="12" height="10" fill="#b8c0d0"/>
+    <path d="M20 32 h38 q18 0 18 20 v8 h-14 v-6 q0 -8 -8 -8 h-34 q-6 0 -6 -7 q0 -7 6 -7 z" fill="#b8c0d0"/>
+    <path d="M20 39 h6" stroke="#8b9bb8" stroke-width="4"/>
+    <path d="M65 66 q-2 8 2 12 q5 -4 2 -12 z" fill="#4cc9f0" stroke-width="3.5"/>
+    <path d="M60 84 q-2 5 1 8 q4 -3 2 -8 z" fill="#4cc9f0" stroke-width="3"/>
+    <path d="M72 86 q-2 4 1 7 q4 -2 2 -7 z" fill="#4cc9f0" stroke-width="3"/>`,
 
   pig: `
     <circle cx="50" cy="54" r="28" fill="#f7a1c4"/>
@@ -68,10 +70,15 @@ export const PICTURES_1 = {
     <line x1="10" y1="70" x2="90" y2="70"/>`,
 
   net: `
-    <line x1="24" y1="88" x2="52" y2="46"/>
-    <ellipse cx="62" cy="32" rx="22" ry="20" fill="#eaf6ff" fill-opacity="0.5"/>
-    <path d="M46 22 l32 20 M42 32 l38 8 M54 14 l22 34 M66 12 l6 38" fill="none" stroke-width="2.5"/>
-    <rect x="18" y="84" width="12" height="8" rx="4" transform="rotate(-56 24 88)" fill="#b5793c"/>`,
+    <line x1="16" y1="90" x2="44" y2="54" stroke="#b5793c" stroke-width="8"/>
+    <line x1="16" y1="90" x2="44" y2="54" stroke-width="3" stroke-opacity="0.35"/>
+    <circle cx="62" cy="34" r="25" fill="#eaf6ff" fill-opacity="0.35"/>
+    <path d="M46 18 q16 14 32 32 M40 30 q20 10 44 8 M56 11 q6 22 2 46" fill="none" stroke-width="2.5"/>
+    <path d="M52 55 q4 -22 -4 -34 M72 53 q12 -14 12 -28" fill="none" stroke-width="2.5"/>
+    <circle cx="62" cy="34" r="25" fill="none" stroke-width="5.5"/>
+    <ellipse cx="24" cy="24" rx="7" ry="10" transform="rotate(-30 24 24)" fill="#f7a1c4"/>
+    <ellipse cx="14" cy="30" rx="6" ry="9" transform="rotate(-50 14 30)" fill="#f7a1c4"/>
+    <path d="M20 30 l4 -6" fill="none" stroke-width="3"/>`,
 
   nest: `
     <path d="M20 56 a30 22 0 0 0 60 0 z" fill="#b5793c"/>
@@ -183,13 +190,15 @@ export const PICTURES_1 = {
     <path d="M50 48 v34 q0 10 -9 10 q-8 0 -8 -8" fill="none" stroke-width="6"/>`,
 
   rat: `
-    <path d="M18 60 q4 -18 26 -18 q20 0 30 12 l12 8 q-4 6 -14 4 q-4 10 -22 10 h-14 q-18 0 -18 -16 z" fill="#9aa3b8"/>
-    <circle cx="36" cy="36" r="10" fill="#9aa3b8"/>
-    <circle cx="36" cy="36" r="4" fill="#f7a1c4" stroke-width="3"/>
-    <circle cx="62" cy="54" r="2.5" fill="#1e1e46" stroke="none"/>
-    <circle cx="84" cy="62" r="3" fill="#f7a1c4" stroke-width="3"/>
-    <path d="M18 66 q-12 6 -8 18" fill="none"/>
-    <path d="M74 66 l10 -2 M74 70 l9 4" fill="none" stroke-width="2.5"/>`,
+    <path d="M14 64 q-12 2 -10 12 q2 8 10 6" fill="none" stroke="#f7a1c4" stroke-width="5"/>
+    <path d="M16 62 q0 -24 32 -24 q20 0 32 12 l12 10 q2 3 -2 5 l-14 3 q-10 10 -28 10 h-14 q-18 0 -18 -16 z" fill="#9aa3b8"/>
+    <circle cx="60" cy="36" r="9" fill="#9aa3b8"/>
+    <circle cx="60" cy="36" r="4" fill="#f7a1c4" stroke-width="2.5"/>
+    <circle cx="72" cy="52" r="2.8" fill="#1e1e46" stroke="none"/>
+    <circle cx="91" cy="61" r="3.5" fill="#f7a1c4" stroke-width="3"/>
+    <path d="M86 64 l8 3 M86 60 l9 -1" fill="none" stroke-width="2.2"/>
+    <ellipse cx="36" cy="80" rx="7" ry="4" fill="#8891a8"/>
+    <ellipse cx="58" cy="80" rx="7" ry="4" fill="#8891a8"/>`,
 
   rocket: `
     <path d="M50 6 C62 14 68 30 68 48 L68 66 L32 66 L32 48 C32 30 38 14 50 6 Z" fill="#e8edf5"/>
@@ -266,8 +275,10 @@ export const PICTURES_1 = {
     <line x1="10" y1="84" x2="90" y2="84"/>`,
 
   cliff: `
-    <path d="M40 88 L40 30 L52 18 L66 26 L62 44 L70 60 L64 88 Z" fill="#b5793c"/>
-    <path d="M40 30 L52 18 L66 26 L62 44 L54 40 Z" fill="#7ac74f"/>
-    <path d="M48 48 l8 6 M46 66 l10 4" fill="none" stroke="#7a4a2b" stroke-width="3.5"/>
-    <path d="M8 88 q8 -6 16 0 q8 6 16 0 M64 88 q8 -6 16 0 q6 5 12 1" fill="none" stroke="#4cc9f0"/>`,
+    <circle cx="82" cy="18" r="8" fill="#ffd75e"/>
+    <path d="M10 90 V32 q0 -8 8 -8 h22 l6 10 -5 9 7 10 -4 11 6 11 v15 z" fill="#b5793c"/>
+    <path d="M10 32 q0 -8 8 -8 h22 l6 10 -2 4 -34 2 z" fill="#7ac74f"/>
+    <path d="M22 22 q0 -6 3 -8 M32 22 q0 -7 4 -9" fill="none" stroke="#4d9930" stroke-width="3.5"/>
+    <path d="M16 48 h18 M16 62 h22 M16 76 h20" fill="none" stroke="#7a4a2b" stroke-width="3.5"/>
+    <path d="M56 78 q9 -7 18 0 q9 7 18 0 M62 88 q9 -7 18 0 q7 6 14 1" fill="none" stroke="#4cc9f0" stroke-width="4.5"/>`,
 };

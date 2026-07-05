@@ -102,6 +102,8 @@ export class MapScene extends Scene {
       node.eventMode = 'static';
       node.cursor = saved.unlocked ? 'pointer' : 'default';
       node.hitArea = new PIXI.Circle(0, 0, NODE_R + 18);
+      node.on('pointerover', () => { if (isUnlocked(level.id)) tween(node.scale, { x: 1.05, y: 1.05 }, 120); });
+      node.on('pointerout', () => tween(node.scale, { x: 1, y: 1 }, 120));
       node.on('pointertap', () => {
         if (this.dragDist > 12 || this.zooming) return;
         if (isUnlocked(level.id)) this.diveTo(level, node);

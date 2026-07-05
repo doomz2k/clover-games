@@ -40,9 +40,11 @@ export const PICTURES_2 = {
     <circle cx="26" cy="66" r="3" fill="#e8b64a"/>`,
 
   thumb: `
-    <path d="M34 44 L34 88 L70 88 Q78 88 78 78 Q80 74 78 70 Q81 66 78 61 Q81 56 77 52 Q80 44 70 44 L52 44 Q58 30 56 18 Q54 10 46 14 Q44 28 34 44 Z" fill="#f7c59f"/>
-    <path d="M34 44 v44 h-14 v-44 z" fill="#4cc9f0"/>
-    <path d="M78 70 h-14 M78 61 h-13 M77 52 h-12" fill="none" stroke-width="3.5"/>`,
+    <rect x="14" y="48" width="16" height="34" rx="5" fill="#4cc9f0"/>
+    <path d="M30 50 h30 q9 0 9 8 q0 6 -5 7 q5 2 4 8 q-1 5 -6 6 q4 2 3 7 q-1 6 -8 6 h-27 z" fill="#f7c59f"/>
+    <path d="M64 65 h-12 M62 79 h-11" fill="none" stroke-width="3"/>
+    <path d="M30 50 q-2 -18 8 -28 q7 -7 12 -1 q4 5 0 12 l-8 17 z" fill="#f7c59f"/>
+    <path d="M36 28 q4 -3 8 -1" fill="none" stroke-width="3"/>`,
 
   three: `
     <path d="M32 26 Q40 12 56 14 Q74 17 72 34 Q71 43 60 48 Q74 52 74 68 Q72 86 52 86 Q36 86 30 72" fill="none" stroke-width="13"/>

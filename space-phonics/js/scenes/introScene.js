@@ -3,7 +3,7 @@
 // the question round.
 
 import { Scene, W, H } from '../core/sceneManager.js';
-import { makeStarfield, makeText, makeButton, popIn, COLORS } from '../core/ui.js';
+import { makeStarfield, makeText, makeButton, popIn, pulseForever, COLORS } from '../core/ui.js';
 import { makePlanet } from '../gen/planetGenerator.js';
 import { makeAlien } from '../gen/alienGenerator.js';
 import { makeCargoShip } from '../core/cargoShip.js';
@@ -56,7 +56,7 @@ export class IntroScene extends Scene {
     this.goBtn.x = W / 2;
     this.goBtn.y = H - 110;
     this.container.addChild(this.goBtn);
-    popIn(this.goBtn, 900);
+    popIn(this.goBtn, 900).then(() => pulseForever(this.goBtn));
     this.goBtn.once('pointertap', () => {
       stopSpeech();
       this.game.scenes.switchTo(new QuestionScene(this.game), { planet });

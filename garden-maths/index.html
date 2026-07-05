@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Garden Maths</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+<link href="../fonts/fonts.css" rel="stylesheet">
 <link rel="manifest" href="../manifest.webmanifest">
 <link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../icons/icon-192.png">
@@ -97,10 +95,31 @@
     transition: width 0.15s;
   }
   #load-msg { color: #2e4d28; font-size: 16px; }
+
+  /* portrait devices: ask for landscape instead of squeezing the game */
+  #rotate-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(6, 10, 30, 0.94);
+    color: #ffd75e;
+    font-family: 'Fredoka One', sans-serif;
+    font-size: clamp(20px, 5vw, 32px);
+    text-align: center;
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; padding: 24px;
+  }
+  #rotate-phone { font-size: 64px; animation: turn 1.6s ease-in-out infinite; }
+  @keyframes turn { 0%, 20% { transform: rotate(0); } 60%, 100% { transform: rotate(90deg); } }
+  @media (orientation: portrait) { #rotate-overlay { display: flex; } }
 </style>
 </head>
 <body>
   <div id="game-canvas-holder"></div>
+  <div id="rotate-overlay">
+    <div id="rotate-phone">&#128241;</div>
+    <p>Please turn your device sideways!</p>
+  </div>
+
   <a id="hub-btn" href="../index.html" title="Back to the hub">&#8962; Hub</a>
   <button id="fs-btn" title="Full screen">&#x26F6;</button>
   <button id="mute-btn" title="Sound on/off">&#x1F50A;</button>

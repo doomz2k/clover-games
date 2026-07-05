@@ -85,6 +85,8 @@ export class MapScene extends Scene {
       node.eventMode = 'static';
       node.cursor = saved.unlocked ? 'pointer' : 'default';
       node.hitArea = new PIXI.Circle(0, 0, PLANET_R + 20);
+      node.on('pointerover', () => { if (isUnlocked(planet.id)) tween(node.scale, { x: 1.05, y: 1.05 }, 120); });
+      node.on('pointerout', () => tween(node.scale, { x: 1, y: 1 }, 120));
       node.on('pointertap', () => {
         if (this.dragDist > 12 || this.zooming) return;
         if (isUnlocked(planet.id)) this.launchPlanet(planet, node);

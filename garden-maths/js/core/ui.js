@@ -52,6 +52,8 @@ export function makeButton(label, { width = 280, height = 84, fill = COLORS.gold
   const up = () => { face.y = 0; txt.y = 0; };
   c.on('pointerup', up);
   c.on('pointerupoutside', up);
+  c.on('pointerover', () => tween(c.scale, { x: 1.06, y: 1.06 }, 120));
+  c.on('pointerout', () => tween(c.scale, { x: 1, y: 1 }, 120));
   c.on('pointertap', () => sfxTap());
   c.setEnabled = (on) => {
     c.eventMode = on ? 'static' : 'none';
@@ -76,6 +78,18 @@ export function makeCard(width, height, { fill = COLORS.cardFill, border = COLOR
       .roundRect(-width / 2, -height / 2, width, height, 24).stroke({ width: w, color });
   };
   return c;
+}
+
+
+/** Gentle infinite breathing pulse for primary call-to-action buttons. */
+export function pulseForever(obj, amount = 1.05, period = 950) {
+  const grow = () => {
+    if (obj.destroyed) return;
+    tween(obj.scale, { x: amount, y: amount }, period / 2, { ease: Ease.inOutQuad })
+      .then(() => tween(obj.scale, { x: 1, y: 1 }, period / 2, { ease: Ease.inOutQuad }))
+      .then(grow);
+  };
+  grow();
 }
 
 export function popIn(obj, delay = 0, duration = 350) {
@@ -158,6 +172,21 @@ export function makeGarden(viewW, viewH, { seasonShift = 0 } = {}) {
   sun.addChild(sunGlow, sunCore);
   container.addChild(sun);
 
+  // Soft clouds drifting across the sky
+  const clouds = [];
+  for (let i = 0; i < 3; i++) {
+    const c = new PIXI.Graphics();
+    const s = 0.7 + rand() * 0.6;
+    c.ellipse(0, 0, 70 * s, 26 * s).fill({ color: 0xffffff, alpha: 0.85 });
+    c.ellipse(-42 * s, 8 * s, 44 * s, 20 * s).fill({ color: 0xffffff, alpha: 0.85 });
+    c.ellipse(44 * s, 6 * s, 48 * s, 22 * s).fill({ color: 0xffffff, alpha: 0.85 });
+    c.x = rand() * viewW;
+    c.y = 46 + rand() * (soilY * 0.35);
+    c._v = 6 + rand() * 9;
+    container.addChild(c);
+    clouds.push(c);
+  }
+
   // Distant hills
   const hills = new PIXI.Graphics();
   hills.moveTo(0, soilY).quadraticCurveTo(viewW * 0.22, soilY - 130, viewW * 0.52, soilY).closePath().fill(0x5f9e4a);
@@ -195,6 +224,20 @@ export function makeGarden(viewW, viewH, { seasonShift = 0 } = {}) {
   }
   container.addChild(grassLayer);
 
+  // Ambient life: drifting pollen motes and the occasional passing bird,
+  // both redrawn each frame into one Graphics.
+  const life = new PIXI.Graphics();
+  container.addChild(life);
+  const pollenMotes = [];
+  for (let i = 0; i < 16; i++) {
+    pollenMotes.push({
+      x: rand() * viewW, y: soilY - rand() * 280,
+      vx: 8 + rand() * 12, vy: -(3 + rand() * 5), ph: rand() * Math.PI * 2,
+    });
+  }
+  let bird = null;
+  let birdCooldown = 5 + rand() * 8;
+
   let timeOfDay = 0;
   function placeSun() {
     const t = timeOfDay;
@@ -225,9 +268,50 @@ export function makeGarden(viewW, viewH, { seasonShift = 0 } = {}) {
       return tween(skyGold, { alpha: 1 }, 1200, { ease: Ease.inOutQuad });
     },
     tick(dtMS) {
-      t += dtMS / 1000;
+      const dt = dtMS / 1000;
+      t += dt;
       for (const b of blades) b.rotation = Math.sin(t * 1.3 + b._phase) * 0.09;
       sunGlow.alpha = 0.85 + Math.sin(t * 1.8) * 0.15;
+
+      for (const c of clouds) {
+        c.x += c._v * dt;
+        if (c.x > viewW + 160) c.x = -160;
+      }
+
+      life.clear();
+      for (const m of pollenMotes) {
+        m.x += m.vx * dt;
+        m.y += m.vy * dt;
+        if (m.x > viewW + 8 || m.y < soilY - 320) {
+          m.x = rand() * viewW; m.y = soilY - rand() * 40;
+        }
+        life.circle(m.x + Math.sin(t * 1.1 + m.ph) * 8, m.y, 2)
+          .fill({ color: 0xfff3c0, alpha: 0.4 + Math.sin(t * 1.7 + m.ph) * 0.2 });
+      }
+      if (bird) {
+        bird.x += bird.vx * dt;
+        if (bird.x < -60 || bird.x > viewW + 60) {
+          bird = null;
+        } else {
+          const flap = Math.sin(t * 10) * 6;
+          const bx = bird.x, by = bird.y + Math.sin(t * 2) * 10;
+          life.moveTo(bx - 14, by)
+            .quadraticCurveTo(bx - 7, by - 8 - flap, bx, by)
+            .quadraticCurveTo(bx + 7, by - 8 - flap, bx + 14, by)
+            .stroke({ width: 3, color: 0x2e3d1a, alpha: 0.75 });
+        }
+      } else {
+        birdCooldown -= dt;
+        if (birdCooldown <= 0) {
+          birdCooldown = 8 + rand() * 10;
+          const ltr = rand() < 0.5;
+          bird = {
+            x: ltr ? -50 : viewW + 50,
+            y: 60 + rand() * (soilY * 0.4),
+            vx: (ltr ? 1 : -1) * (60 + rand() * 50),
+          };
+        }
+      }
     },
   };
 }

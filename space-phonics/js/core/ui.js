@@ -51,6 +51,8 @@ export function makeButton(label, { width = 280, height = 84, fill = COLORS.gold
   const up = () => { face.y = 0; txt.y = 0; };
   c.on('pointerup', up);
   c.on('pointerupoutside', up);
+  c.on('pointerover', () => tween(c.scale, { x: 1.06, y: 1.06 }, 120));
+  c.on('pointerout', () => tween(c.scale, { x: 1, y: 1 }, 120));
   c.on('pointertap', () => sfxTap());
   return c;
 }
@@ -81,6 +83,18 @@ export function makeCard(width, height, { fill = COLORS.cardFill, border = COLOR
 }
 
 /** Pop-in helper used all over: scale from 0 with a back ease. */
+
+/** Gentle infinite breathing pulse for primary call-to-action buttons. */
+export function pulseForever(obj, amount = 1.05, period = 950) {
+  const grow = () => {
+    if (obj.destroyed) return;
+    tween(obj.scale, { x: amount, y: amount }, period / 2, { ease: Ease.inOutQuad })
+      .then(() => tween(obj.scale, { x: 1, y: 1 }, period / 2, { ease: Ease.inOutQuad }))
+      .then(grow);
+  };
+  grow();
+}
+
 export function popIn(obj, delay = 0, duration = 350) {
   const sx = obj.scale.x, sy = obj.scale.y;
   obj.scale.set(0.01);
@@ -146,12 +160,59 @@ export function makeStarfield(viewW, viewH, worldWidth = viewW) {
     layers.push(layer);
   }
 
+  // Ambient life (screen-fixed): slow-drifting dust motes and the
+  // occasional shooting star streaking across the sky.
+  const ambient = new PIXI.Graphics();
+  container.addChild(ambient);
+  const motes = [];
+  for (let i = 0; i < 22; i++) {
+    motes.push({
+      x: rand() * viewW, y: rand() * viewH,
+      s: 0.6 + rand() * 1.1, vx: 4 + rand() * 8, ph: rand() * Math.PI * 2,
+    });
+  }
+  let shoot = null;
+  let shootCooldown = 4 + rand() * 6;
+
   let t = 0;
   return {
     container,
     tick(dtMS) {
-      t += dtMS / 1000;
+      const dt = dtMS / 1000;
+      t += dt;
       for (const tw of twinklers) tw.alpha = 0.35 + (Math.sin(t * tw._speed + tw._phase) + 1) * 0.325;
+
+      ambient.clear();
+      for (const m of motes) {
+        m.x += m.vx * dt;
+        if (m.x > viewW + 10) m.x = -10;
+        ambient.circle(m.x, m.y + Math.sin(t * 0.7 + m.ph) * 6, m.s)
+          .fill({ color: 0xffffff, alpha: 0.18 + Math.sin(t * 1.3 + m.ph) * 0.08 });
+      }
+      if (shoot) {
+        shoot.life -= dt;
+        shoot.x += shoot.vx * dt;
+        shoot.y += shoot.vy * dt;
+        if (shoot.life <= 0) {
+          shoot = null;
+        } else {
+          const a = Math.min(1, shoot.life * 2.2);
+          ambient.moveTo(shoot.x, shoot.y)
+            .lineTo(shoot.x - shoot.vx * 0.16, shoot.y - shoot.vy * 0.16)
+            .stroke({ width: 3, color: 0xffffff, alpha: a });
+          ambient.circle(shoot.x, shoot.y, 2.6).fill({ color: 0xffffff, alpha: a });
+        }
+      } else {
+        shootCooldown -= dt;
+        if (shootCooldown <= 0) {
+          shootCooldown = 5 + rand() * 9;
+          shoot = {
+            x: viewW * (0.25 + rand() * 0.7), y: -12,
+            vx: -(320 + rand() * 260), vy: 200 + rand() * 140,
+            life: 0.9,
+          };
+        }
+      }
     },
     setScroll(x) {
       for (const layer of layers) layer.x = -x * layer._factor;
