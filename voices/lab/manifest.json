@@ -21,18 +21,24 @@
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "chuh": [
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "duh": [
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "ee": [
@@ -69,12 +75,16 @@
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "huh": [
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "ih": [
@@ -99,12 +109,16 @@
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "kwuh": [
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "lll": [
@@ -159,6 +173,8 @@
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "rrr": [
@@ -189,6 +205,8 @@
   "piper-slow",
   "piper-natural",
   "espeak",
+  "espeak-uh",
+  "piper-uh",
   "live"
  ],
  "uh": [
