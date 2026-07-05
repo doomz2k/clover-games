@@ -249,6 +249,25 @@ export class CompletionScene extends Scene {
     popIn(mapBtn, 200);
     this.mapBtn = mapBtn;
 
+    // photo mode: save this moment as a picture
+    const snap = makeButton('', { width: 84, height: 84 });
+    const cam = makeText('\u{1F4F8}', 40);
+    cam.anchor.set(0.5);
+    snap.addChild(cam);
+    snap.x = W - 66;
+    snap.y = H - 100;
+    snap.on('pointertap', async () => {
+      try {
+        const url = await this.game.app.renderer.extract.base64(this.game.scenes.root);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `space-phonics-${this.planet.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+        a.click();
+      } catch { /* extract unsupported - button just does nothing */ }
+    });
+    this.container.addChild(snap);
+    popIn(snap, 320);
+
     if (retryProminent) {
       const retry = makeButton('Try again!', { width: 340, height: 96, fontSize: 38, fill: 0x7ac74f, edge: 0x437a25 });
       retry.x = W / 2 - 130;
