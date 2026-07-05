@@ -33,6 +33,16 @@ ESPEAK = {
 }
 
 
+# Stop consonants can't be spelled reliably ("puh" gets read as a word and
+# comes out wrong). These get two extra candidates rendered from raw
+# phonemes: the exact consonant plus a tiny schwa release, the way phonics
+# teachers say it.
+STOP_RELEASE = {
+    "puh": "p", "buh": "b", "tuh": "t", "duh": "d", "kuh": "k",
+    "guh": "g", "chuh": "tS", "kwuh": "kw", "huh": "h",
+}
+
+
 def fnv(s):
     h = 0x811C9DC5
     for ch in s:
@@ -72,6 +82,32 @@ def main():
             cands.append("espeak")
         if os.path.exists(tmp):
             os.remove(tmp)
+
+        if token in STOP_RELEASE:
+            ph = STOP_RELEASE[token] + "@"
+            # exact phoneme + schwa release via espeak (accurate, audible)
+            tmp = f"/tmp/lab_{token}_espeakuh.wav"
+            r = subprocess.run(
+                ["espeak-ng", "-v", "en-gb", "-s", "95", "-w", tmp, f"[[{ph}]]"])
+            if r.returncode == 0 and os.path.getsize(tmp) > 1000:
+                to_ogg(tmp, f"voices/lab/{token}__espeak-uh.ogg", gain_db=3)
+                cands.append("espeak-uh")
+            if os.path.exists(tmp):
+                os.remove(tmp)
+            # the neural narrator speaking the same raw phonemes (espeak's
+            # [[..]] notation passes through Piper's phonemizer)
+            tmp = f"/tmp/lab_{token}_piperuh.wav"
+            try:
+                with wave.open(tmp, "wb") as w:
+                    voice.synthesize_wav(f"[[{ph}]]", w,
+                                         syn_config=SynthesisConfig(length_scale=1.3))
+                if os.path.getsize(tmp) > 1000:
+                    to_ogg(tmp, f"voices/lab/{token}__piper-uh.ogg")
+                    cands.append("piper-uh")
+            except Exception as e:
+                print(f"  {token}: piper-uh failed ({e})")
+            if os.path.exists(tmp):
+                os.remove(tmp)
 
         # the shipped clip (currently the trimmed human recording where one
         # exists, otherwise piper-slow) - lets the lab compare "what's live"
