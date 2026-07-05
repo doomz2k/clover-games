@@ -63,8 +63,11 @@ export class SceneManager {
   }
 
   layout() {
-    const sw = this.app.renderer.width / this.app.renderer.resolution;
-    const sh = this.app.renderer.height / this.app.renderer.resolution;
+    // app.screen is in CSS pixels at every devicePixelRatio (renderer.width
+    // already is too in Pixi v8 - dividing by resolution shrank the stage
+    // by the OS display-scaling factor, leaving dead space below/right).
+    const sw = this.app.screen.width;
+    const sh = this.app.screen.height;
     // Fill the entire window at any aspect ratio: the logical 1280x800
     // stage stretches to match. No letterboxing, nothing cropped.
     this.root.scale.set(sw / W, sh / H);
