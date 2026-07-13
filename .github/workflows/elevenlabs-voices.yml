@@ -53,6 +53,10 @@ jobs:
       - name: Re-apply operator sound picks
         run: python3 tools/apply_sound_choices.py
 
+      # operator-supplied recordings always win
+      - name: Re-install custom sounds
+        run: python3 tools/import_custom_sounds.py
+
       - name: Commit voices
         id: commit
         run: |

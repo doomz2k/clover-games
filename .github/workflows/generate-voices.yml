@@ -50,6 +50,10 @@ jobs:
       - name: Fetch phoneme recordings
         run: python tools/fetch_phoneme_clips.py
 
+      # operator-supplied recordings always win
+      - name: Re-install custom sounds
+        run: python3 tools/import_custom_sounds.py
+
       - name: Commit voices
         id: commit
         run: |
